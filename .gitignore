@@ -1,0 +1,50 @@
+# Node.js
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# dotenv environment variables
+.env
+.env.*  # for .env.development, .env.local, etc.
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Build output
+dist/
+build/
+
+# Coverage reports
+coverage/
+
+# PM2 logs and runtime
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Next.js
+.next/
+
+# TypeScript
+*.tsbuildinfo
+
+# Misc
+*.tgz
+!.npmrc
