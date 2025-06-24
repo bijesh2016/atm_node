@@ -12,4 +12,7 @@ router.get("/", (req, res, next) => {
 
 
 router.use('/auth',authRouter)
+router.use('/atm',atmRouter)
+router.use('/bank',bankRouter)
+router.use('/branch',branchRouter)
 module.exports = router;

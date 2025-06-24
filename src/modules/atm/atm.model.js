@@ -39,6 +39,5 @@ const AtmSchema = new mongoose.Schema({
     required:true
   }]
 });
-
 const AtmModel = mongoose.model("Atm", AtmSchema);
 module.exports = AtmModel;

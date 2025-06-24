@@ -17,6 +17,7 @@ const registerUserDTD=Joi.object({
     .required(),
     dob:Joi.date().less("now"),
     image:Joi.string().allow(null,"").optional().default(null),
+    status:Joi.string().regex(/^(active|inactive)$/).default('inactive').required()
 })
 
 const LoginDTD=Joi.object({
