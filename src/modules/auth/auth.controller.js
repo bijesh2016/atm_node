@@ -12,7 +12,7 @@ class AuthController {
         data: user,
         message: "Your account has been registered successfully",
         status: "SUCCESS",
-        option: null
+        option: null,
       });
     } catch (exception) {
       next(exception);
@@ -27,7 +27,7 @@ class AuthController {
         data: userProfile,
         message: "Your Profile",
         status: "OK",
-        option: null
+        option: null,
       });
     } catch (exception) {
       next(exception);
@@ -45,7 +45,7 @@ class AuthController {
         throw {
           code: 422,
           message: "User not found",
-          status: "USER_DOES_NOT_EXISTS"
+          status: "USER_DOES_NOT_EXISTS",
         };
       }
       //expiry
@@ -62,7 +62,7 @@ class AuthController {
           message:
             "A new verification link has been sent to your registered account",
           status: "RESENT_VERIFICATION_LINK",
-          option: null
+          option: null,
         });
       } else {
         userDetail.activationToken = null;
@@ -83,26 +83,108 @@ class AuthController {
     }
   };
 
-  login=async(req,res,next)=>{
-    res.json({
-        data:null,
-        message:"Login Successful",
-        status:"LOGIN SUCCESSFUL",
-        option:null,
-    })
-  }
+  login = async (req, res, next) => {
+    try {
+      const { email, password } = req.body;
+      cc;
+      const userInfo = await userSvc.getSingleRowByFilter({
+        email: email,
+      });
+      if (!userInfo) {
+        throw {
+          code: 422,
+          message: "Credientials doesnot match",
+          status: "CREDIENTIALS_DOESNOT_MATCH",
+        };
+      }
+      if (
+        userInfo.status !== Status.ACTIVE ||
+        userInfo.activationToken != null
+      ) {
+        throw {
+          code: 422,
+          message: "Account not activated yet",
+          status: "ACCOUNT_NOT_ACTIVATED_YET",
+        };
+      }
 
-logout=async(req,res,next)=>{
-    res.json({
-        data:null,
-        message:"Logout Successful",
-        status:"LOGOUT SUCCESSFUL",
-        option:null
-    })
-}
+      // Verify password
+      const isPasswordValid = bcrypt.compareSync(password, userInfo.password);
+      if (!isPasswordValid) {
+        throw {
+          code: 422,
+          message: "Credentials do not match",
+          status: "CREDENTIALS_DONOT_MATCH",
+        };
+      }
 
+      //jwt token
+      const accessToken = jwt.sign(
+        {
+          sub: userInfo.id,
+          type: "Bearer",
+        },
+        AppConfig.jwtSecret,
+        { expiresIn: "1hr" }
+      );
+      const refreshToken = jwt.sign(
+        {
+          sub: userInfo.id,
+          type: "Refresh",
+        },
+        AppConfig.jwtSecret,
+        { expiresIn: "5d" }
+      );
 
+      let sessionData = {
+        user: userInfo._id,
+        token: {
+          access: accessToken,
+          refresh: refreshToken,
+        },
+        accessDevice: "web",
+        ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
+      };
+      await authSvc.storeSession(sessionData);
+      res.json({
+        data: {
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        },
+        message: "Login Successful",
+        status: "LOGIN_SUCCESS",
+        options: null,
+      });
+    } catch (exception) {
+      next(exception);
+    }
+  };
 
+  logout = async (req, res, next) => {
+    try {
+      const loggedInUser = req.loggedInUser;
+      let filter = {};
+      if (req.query.logoutFromAll) {
+        filter = {
+          user: loggedInUser._id,
+        };
+      } else {
+        const token = req.headers["authorization"]?.replace("Bearer ", "");
+        filter = {
+          user: loggedInUser._id,
+          "token.access": token,
+        };
+      }
+
+      await authSvc.destroySession(filter);
+      res.json({
+        message: "Logged out successfully",
+        status: "LOGOUT_SUCCESSFUL",
+      });
+    } catch (exception) {
+      next(exception);
+    }
+  };
 }
 
 const authCtrl = new AuthController();

@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const SessionSchema = new mongoose.Schema({
     user: {
         type: mongoose.Types.ObjectId,
@@ -20,3 +19,4 @@ const SessionSchema = new mongoose.Schema({
 
 const SessionModel = mongoose.model("Session", SessionSchema);
 module.exports = SessionModel;
+

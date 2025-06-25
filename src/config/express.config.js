@@ -1,18 +1,46 @@
-const express=require("express")
-const app=express()
+const express = require("express");
+const multer = require("multer");
+const router = require("./router.config");
+const app = express();
+
+app.use(express.json());
+app.use("/api/atm_locator/", router);
+app.get('/test',(req,res)=>{
+       console.log('testin')
+})
+
+app.use("/assets", express.static("./public/uploads"));
 
 app.use(express.json())
-app.use("/api/atm_locator/", router);
+app.use(express.urlencoded())
 
-// app.use(express.json())
-// app.use(express.urlencoded())
+app.use((req, res, next) => {
+  next({
+    code: 404,
+    message: "Resources not found",
+    status: "NOT_FOUND_ERR",
+  });
+});
 
-app.use((req,res,next)=>{ 
-    next({
-        code:404,
-        message:"Resources not found",
-        status:"NOT_FOUND_ERR",
-    })
-    })
+app.use((error, req, res, next) => {
 
-module.exports=app;
+
+  console.log("garbage Collector:", error);
+  console.log("I am here");
+
+
+  let statusCode = error.code || 500;
+  let details = error.details || null;
+  let msz = error.message || "Internal Server Error";
+  let status = error.status || "SERVER ERROR";
+
+
+  res.status(statusCode).json({
+    error: details,
+    message: msz,
+    status: status,
+    option: null,
+  });
+});
+
+module.exports = app;

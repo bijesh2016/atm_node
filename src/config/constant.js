@@ -7,3 +7,5 @@ const UserRoles={
     ADMIN:'admin',
     CUSTOMER:'customer'
 }
+
+module.exports = { Status, UserRoles };

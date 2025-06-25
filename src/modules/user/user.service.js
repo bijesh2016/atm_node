@@ -1,4 +1,4 @@
-const fileUploadSvc=require("../../service/fileupload.service")
+const fileUploadSvc=require("../../services/fileupload.service")
 const bcrypt=require("bcryptjs")
 const {randomStringGenerate}=require("../../utilities/helpers")
 const {Status}=require("../../config/constant")

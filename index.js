@@ -1,8 +1,6 @@
 const http=require('http');
-
-const httpServer=http.createServer((req,res)=>{
-    res.end("welcome")
-});
+const app=require("./src/config/express.config")
+const httpServer=http.createServer(app)
 
 const PORT=9000;
 const HOST='localhost';

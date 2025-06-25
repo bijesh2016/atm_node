@@ -45,6 +45,7 @@ notifyActivationSuccess=async(user)=>{
         throw exception
     }
 }
+
 }
 const AuthMailSvc=new AuthMail()
 module.exports=AuthMailSvc
