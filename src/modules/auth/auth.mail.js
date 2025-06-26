@@ -1,4 +1,4 @@
-const EmailService = require("../../service/mail.service");
+const EmailService = require("../../services/mail.service");
 const { AppConfig } = require("../../config/config");
 
 class AuthMail{

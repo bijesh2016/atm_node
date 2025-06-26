@@ -6,11 +6,13 @@ const UserModel = require("./user.model")
 
 class UserService{
    async transformUserRegister(req){
+    console.log("test"+req.body.password)
     try{
         const data=req.body
         if(req.file){
         data.file=await fileUploadSvc.uploadFile(req.file.path,"/users");
         }
+        // console.log(password)
         data.password=bcrypt.hashSync(data.password,12)
         data.activationToken=randomStringGenerate(150)
         data.expiryTime=new Date(Date.now()+3600000)

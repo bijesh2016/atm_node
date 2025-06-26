@@ -1,6 +1,12 @@
 const userSvc = require("../../modules/user/user.service");
 const authSvc = require("./auth.service");
-const authMailSvc = require("../../services/mail.service");
+const authMailSvc = require("./auth.mail");
+const {AppConfig}=require("../../config/config")
+const jwt=require("jsonwebtoken")
+const bcrypt=require("bcryptjs")
+const EmailSvc=require("../../services/mail.service")
+
+const uploader=require("../../middlewares/file-upload.middleware")
 class AuthController {
   registerUser = async (req, res, next) => {
     try {
@@ -86,7 +92,6 @@ class AuthController {
   login = async (req, res, next) => {
     try {
       const { email, password } = req.body;
-      cc;
       const userInfo = await userSvc.getSingleRowByFilter({
         email: email,
       });
@@ -125,7 +130,7 @@ class AuthController {
           type: "Bearer",
         },
         AppConfig.jwtSecret,
-        { expiresIn: "1hr" }
+        { expiresIn: "1h" }
       );
       const refreshToken = jwt.sign(
         {

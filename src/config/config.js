@@ -1,3 +1,4 @@
+require("dotenv").config()
 const SMTPConfig = {
   provider: process.env.SMTP_PROVIDER,
   host: process.env.SMTP_HOST,
@@ -19,4 +20,8 @@ const CloudinaryConfig = {
   apiSecret: process.env.CLOUDINARY_API_SECRET,
 };
 
-module.exports = { SMTPConfig, AppConfig, CloudinaryConfig };
+const mongoConfig={
+  url:process.env.MONGODB_URL,
+  dbName:process.env.MONGODB_NAME
+}
+module.exports = { SMTPConfig, AppConfig, CloudinaryConfig, mongoConfig};

@@ -1,9 +1,13 @@
 const express = require("express");
 const multer = require("multer");
 const router = require("./router.config");
+require("./mongo.config")
 const app = express();
 
-app.use(express.json());
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+
 app.use("/api/atm_locator/", router);
 app.get('/test',(req,res)=>{
        console.log('testin')
@@ -11,8 +15,6 @@ app.get('/test',(req,res)=>{
 
 app.use("/assets", express.static("./public/uploads"));
 
-app.use(express.json())
-app.use(express.urlencoded())
 
 app.use((req, res, next) => {
   next({
@@ -31,13 +33,25 @@ app.use((error, req, res, next) => {
 
   let statusCode = error.code || 500;
   let details = error.details || null;
-  let msz = error.message || "Internal Server Error";
+  let msg = error.message || "Internal Server Error";
   let status = error.status || "SERVER ERROR";
 
+  if(error.name==="MongoServerError"){
+        statusCode=400;
+        msg='DB error'
+        status='DB_ERROR'
+        details={};
+
+        if(+error.code===11000){
+            Object.keys(error.keyPattern).map((field)=>{
+                details[field]=`${field} should be unique.`
+            })
+        }
+    }
 
   res.status(statusCode).json({
     error: details,
-    message: msz,
+    message: msg,
     status: status,
     option: null,
   });
