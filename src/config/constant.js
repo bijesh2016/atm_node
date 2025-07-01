@@ -1,6 +1,7 @@
 const Status={
     ACTIVE:"active",
-    INACTIVE:"inactive"
+    INACTIVE:"inactive",
+    PENDING:"pending"
 }
 
 const UserRoles={

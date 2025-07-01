@@ -11,17 +11,28 @@ const AtmSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  location: {
-    type: {
-      type: String,
-      enum: ["Point"], 
-      required: true,
-    },
-    coordinates: {
-      type: [Number],
-      required: true,
-    }
+
+  latitude:{
+    type:String,
+    enum:["Point"],
+    required:true,
   },
+  longitude:{
+    type:String,
+    enum:["Point"],
+    required:true,
+  },
+  // location: {
+  //   type: {
+  //     type: String,
+  //     enum: ["Point"], 
+  //     required: true,
+  //   },
+  //   coordinates: {
+  //     type: [Number],
+  //     required: true,
+  //   }
+  // },
   address: {
     type: String,
     required: true,
@@ -36,8 +47,9 @@ const AtmSchema = new mongoose.Schema({
     type:String,
     min:3,
     max:100,
-    required:true
+    required:true,
   }]
 });
+
 const AtmModel = mongoose.model("Atm", AtmSchema);
 module.exports = AtmModel;

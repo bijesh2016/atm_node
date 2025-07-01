@@ -1,5 +1,13 @@
 const express = require('express');
-const router = express.Router();
-// Define ATM routes here
+const atmRouter = express.Router();
+const atmCtrl = require("./atm.controller");
 
-module.exports = router;
+atmRouter.get('/for-home', atmCtrl.atmsForHome);
+// atmRouter.get('/:slug/branches', atmCtrl.branchesByAtmSlug);
+
+atmRouter.get('/',atmCtrl.listAllAtm)
+atmRouter.get('/:id',atmCtrl.atmDetailById)
+atmRouter.get('/:id',atmCtrl.atmUpdateById)
+atmRouter.get('/:id',atmCtrl.atmDeleteById)
+
+module.exports = atmRouter;

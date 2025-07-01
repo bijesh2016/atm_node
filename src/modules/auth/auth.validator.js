@@ -14,6 +14,7 @@ const registerUserDTD = Joi.object({
   role: Joi.string().valid("admin", "user").required(),
 });
 
+
 const LoginDTD = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required(),

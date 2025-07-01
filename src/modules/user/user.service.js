@@ -6,7 +6,6 @@ const UserModel = require("./user.model")
 
 class UserService{
    async transformUserRegister(req){
-    console.log("test"+req.body.password)
     try{
         const data=req.body
         if(req.file){

@@ -1,5 +1,13 @@
 const express = require('express');
-const router = express.Router();
-// Define Branch routes here
+const branchRouter = express.Router();
+const branchCtrl=require('./branch.controller')
 
-module.exports = router;
+branchRouter.get('for-home',branchCtrl.branchForHome);
+branchRouter.get('/',branchCtrl.listAllBranch);
+
+branchRouter.get('/:id',branchCtrl.branchDetailById);
+branchRouter.get('/:id',branchCtrl.branchUpdateById);
+branchRouter.get('/:id',branchCtrl.branchDeleteById);
+
+
+module.exports = branchRouter;

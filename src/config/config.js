@@ -9,7 +9,7 @@ const SMTPConfig = {
 };
 
 const AppConfig = {
-  appUrl: process.env.APP_URL,
+  appUrl: process.env.FRONTEND_URL,
   url: process.env.FrontendUrl,
   jwtSecret: process.env.JWT_SECRET,
 };

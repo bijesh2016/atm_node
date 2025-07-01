@@ -5,8 +5,9 @@ const {AppConfig}=require("../../config/config")
 const jwt=require("jsonwebtoken")
 const bcrypt=require("bcryptjs")
 const EmailSvc=require("../../services/mail.service")
-
-const uploader=require("../../middlewares/file-upload.middleware")
+const {randomStringGenerate}=require("../../utilities/helpers")
+const {Status}=require("../../config/constant")
+// const uploader=require("../../middlewares/file-upload.middleware")
 class AuthController {
   registerUser = async (req, res, next) => {
     try {
@@ -53,6 +54,7 @@ class AuthController {
           message: "User not found",
           status: "USER_DOES_NOT_EXISTS",
         };
+
       }
       //expiry
       let expiryTime = userDetail.expiryTime.getTime();
@@ -89,6 +91,7 @@ class AuthController {
     }
   };
 
+
   login = async (req, res, next) => {
     try {
       const { email, password } = req.body;
@@ -98,35 +101,76 @@ class AuthController {
       if (!userInfo) {
         throw {
           code: 422,
-          message: "Credientials doesnot match",
-          status: "CREDIENTIALS_DOESNOT_MATCH",
-        };
+          message: "User not registered yet",
+          status: "USER_NOT_REGISTERED_YET",
+        }
       }
-      if (
-        userInfo.status !== Status.ACTIVE ||
-        userInfo.activationToken != null
-      ) {
-        throw {
-          code: 422,
-          message: "Account not activated yet",
-          status: "ACCOUNT_NOT_ACTIVATED_YET",
-        };
+      
+    //bcrypt
+    if(bcrypt.compareSync(password,userInfo)){
+      throw{
+        code:422,
+        message:'Crediantials doesnot match',
+        status:'CREDIANTIALS_DOESNOT_MATCH',
       }
+    }
 
-      // Verify password
-      const isPasswordValid = bcrypt.compareSync(password, userInfo.password);
-      if (!isPasswordValid) {
-        throw {
-          code: 422,
-          message: "Credentials do not match",
-          status: "CREDENTIALS_DONOT_MATCH",
-        };
+    if(userInfo.status!== Status.ACTIVE||userInfo.activationToken!==null){
+      throw{
+        code:422,
+        message:"Account not activated yet",
+        status:"NOT_ACTIVATED"
       }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      // if (
+      //   userInfo.status !== Status.ACTIVE ||
+      //   userInfo.activationToken != null
+      // ) {
+      //   throw {
+      //     code: 422,
+      //     message: "Account not activated yet",
+      //     status: "ACCOUNT_NOT_ACTIVATED_YET",
+      //   };
+      // }
+
+      // // Verify password
+      // const isPasswordValid = bcrypt.compareSync(password, userInfo.password);
+      // if (!isPasswordValid) {
+      //   throw {
+      //     code: 422,
+      //     message: "Credentials do not match",
+      //     status: "CREDENTIALS_DONOT_MATCH",
+      //   };
+      // }
 
       //jwt token
       const accessToken = jwt.sign(
         {
-          sub: userInfo.id,
+          sub: userInfo._id,
           type: "Bearer",
         },
         AppConfig.jwtSecret,
@@ -134,23 +178,23 @@ class AuthController {
       );
       const refreshToken = jwt.sign(
         {
-          sub: userInfo.id,
+          sub: userInfo._id,
           type: "Refresh",
         },
         AppConfig.jwtSecret,
         { expiresIn: "5d" }
       );
 
-      let sessionData = {
-        user: userInfo._id,
-        token: {
-          access: accessToken,
-          refresh: refreshToken,
-        },
-        accessDevice: "web",
-        ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
-      };
-      await authSvc.storeSession(sessionData);
+      // let sessionData = {
+      //   user: userInfo._id,
+      //   token: {
+      //     access: accessToken,
+      //     refresh: refreshToken,
+      //   },
+      //   accessDevice: "web",
+      //   ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
+      // };
+      // await authSvc.storeSession(sessionData);
       res.json({
         data: {
           accessToken: accessToken,

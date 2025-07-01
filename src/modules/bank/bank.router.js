@@ -1,5 +1,13 @@
 const express = require('express');
-const router = express.Router();
-// Define Bank routes here
+const bankRouter = express.Router();
+const bankCtrl=require("./bank.controller");
 
-module.exports = router;
+bankRouter.get("/for-home",bankCtrl.banksForHome);
+
+bankRouter.get('/',bankCtrl.listAllBank)
+bankRouter.get('/:id',bankCtrl.bankDetailById);
+bankRouter.get('/:id',bankCtrl.bankUpdateById);
+bankRouter.get('/:id',bankCtrl.bankDeleteById);
+
+
+module.exports =bankRouter;

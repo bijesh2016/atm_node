@@ -12,17 +12,27 @@ const BankSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  location: {
-    type: {
-      type: String,
-      enum: ["Point"],
-      required: true,
-    },
-    coordinates: {
-      type: [Number],
-      required: true,
-    },
+  latitude: {
+    type: String,
+    enum: ["Point"],
+    required: true,
   },
+  longitude: {
+    type: String,
+    enum: ["Point"],
+    required: true,
+  },
+  // location: {
+  //   type: {
+  //     type: String,
+  //     enum: ["Point"],
+  //     required: true,
+  //   },
+  //   coordinates: {
+  //     type: [Number],
+  //     required: true,
+  //   },
+  // },
   address: {
     type: String,
     required: true,
@@ -36,13 +46,14 @@ const BankSchema = new mongoose.Schema({
     enum: Object.values(Status),
     default: Status.INACTIVE,
   },
-  branch:{
-    type:String,
-    required:true,
+  branch: {
+    type: String,
+    required: true,
   },
   website: {
     type: String,
   },
 });
+
 const BankModel = mongoose.model("Bank", BankSchema);
 module.exports = BankModel;

@@ -7,25 +7,37 @@ const BranchSchema = new mongoose.Schema({
     max: 250,
     required: true,
   },
-  location: {
-    type: {
-      type: String,
-      enum: ["Point"],
-      required: true,
-    },
-    coordinates: {
-      type: [Number],
-      required: true,
-    },
+  // location: {
+  //   type: {
+  //     type: String,
+  //     enum: ["Point"],
+  //     required: true,
+  //   },
+  //   coordinates: {
+  //     type: [Number],
+  //     required: true,
+  //   },
+  // },
+  latitude: {
+    type: String,
+    enum: ["Point"],
+    required: true,
+  },
+  longitude: {
+    type: String,
+    enum: ["Point"],
+    required: true,
   },
   bank: {
     type: String,
     required: true,
   },
-  services: [{
-    type: String,
-    required: true,
-  }],
+  services: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
   address: {
     type: String,
     required: true,
@@ -38,5 +50,5 @@ const BranchSchema = new mongoose.Schema({
   },
 });
 
-const BranchModel=mongoose.model("Branch",BranchSchema)
-module.exports=BranchModel;
+const BranchModel = mongoose.model("Branch", BranchSchema);
+module.exports = BranchModel;

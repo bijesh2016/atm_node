@@ -8,8 +8,8 @@ const {registerUserDTD,LoginDTD}=require("./auth.validator")
 authRouter.post("/register",bodyValidator(registerUserDTD),authCtrl.registerUser)
 authRouter.get("/activate/:token",authCtrl.activateUserProfile)
 
-authRouter.post("/login",checkLogin(LoginDTD),authCtrl.login)
+authRouter.post("/login",bodyValidator,authCtrl.login)
 authRouter.post("/me",checkLogin,authCtrl.getLoggedInUserProfile)
-authRouter.patch("/logout",checkLogin,authCtrl.logout)
+// authRouter.patch("/logout",checkLogin,authCtrl.logout)
 
 module.exports=authRouter
