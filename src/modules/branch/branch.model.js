@@ -18,6 +18,11 @@ const BranchSchema = new mongoose.Schema({
   //     required: true,
   //   },
   // },
+   slug: {
+      type: String,
+      required: true,
+      unique: true,
+    },
   latitude: {
     type: String,
     enum: ["Point"],

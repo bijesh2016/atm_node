@@ -7,7 +7,7 @@ const bcrypt=require("bcryptjs")
 const EmailSvc=require("../../services/mail.service")
 const {randomStringGenerate}=require("../../utilities/helpers")
 const {Status}=require("../../config/constant")
-// const uploader=require("../../middlewares/file-upload.middleware")
+const uploader=require("../../middlewares/file-upload.middleware")
 class AuthController {
   registerUser = async (req, res, next) => {
     try {

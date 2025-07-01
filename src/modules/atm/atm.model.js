@@ -11,6 +11,11 @@ const AtmSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+   slug: {
+      type: String,
+      required: true,
+      unique: true,
+    },
 
   latitude:{
     type:String,

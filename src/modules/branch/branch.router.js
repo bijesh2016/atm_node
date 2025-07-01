@@ -6,8 +6,8 @@ branchRouter.get('for-home',branchCtrl.branchForHome);
 branchRouter.get('/',branchCtrl.listAllBranch);
 
 branchRouter.get('/:id',branchCtrl.branchDetailById);
-branchRouter.get('/:id',branchCtrl.branchUpdateById);
-branchRouter.get('/:id',branchCtrl.branchDeleteById);
+branchRouter.put('/:id',branchCtrl.branchUpdateById);
+branchRouter.delete('/:id',branchCtrl.branchDeleteById);
 
 
 module.exports = branchRouter;

@@ -4,10 +4,9 @@ const bankCtrl=require("./bank.controller");
 
 bankRouter.get("/for-home",bankCtrl.banksForHome);
 
-bankRouter.get('/',bankCtrl.listAllBank)
+bankRouter.get('/',bankCtrl.listAllBank);
 bankRouter.get('/:id',bankCtrl.bankDetailById);
-bankRouter.get('/:id',bankCtrl.bankUpdateById);
-bankRouter.get('/:id',bankCtrl.bankDeleteById);
-
+bankRouter.put('/:id',bankCtrl.bankUpdateById);
+bankRouter.delete('/:id',bankCtrl.bankDeleteById);
 
 module.exports =bankRouter;

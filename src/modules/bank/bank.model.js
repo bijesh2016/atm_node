@@ -7,6 +7,11 @@ const BankSchema = new mongoose.Schema({
     max: 250,
     required: true,
   },
+   slug: {
+      type: String,
+      required: true,
+      unique: true,
+    },
   email: {
     type: String,
     required: true,

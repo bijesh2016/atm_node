@@ -7,7 +7,7 @@ atmRouter.get('/for-home', atmCtrl.atmsForHome);
 
 atmRouter.get('/',atmCtrl.listAllAtm)
 atmRouter.get('/:id',atmCtrl.atmDetailById)
-atmRouter.get('/:id',atmCtrl.atmUpdateById)
-atmRouter.get('/:id',atmCtrl.atmDeleteById)
+atmRouter.put('/:id',atmCtrl.atmUpdateById)
+atmRouter.delete('/:id',atmCtrl.atmDeleteById)
 
 module.exports = atmRouter;
