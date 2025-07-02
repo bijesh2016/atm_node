@@ -1,5 +1,5 @@
 const { mongoose } = require("mongoose");
-
+const {Status}=require("../../config/constant")
 const BranchSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -7,17 +7,6 @@ const BranchSchema = new mongoose.Schema({
     max: 250,
     required: true,
   },
-  // location: {
-  //   type: {
-  //     type: String,
-  //     enum: ["Point"],
-  //     required: true,
-  //   },
-  //   coordinates: {
-  //     type: [Number],
-  //     required: true,
-  //   },
-  // },
    slug: {
       type: String,
       required: true,

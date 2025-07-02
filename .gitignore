@@ -48,3 +48,6 @@ pids/
 # Misc
 *.tgz
 !.npmrc
+
+.package-lock.json
+.package.json

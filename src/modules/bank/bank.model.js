@@ -1,5 +1,5 @@
 const { mongoose } = require("mongoose");
-
+const {Status}=require("../../config/constant")
 const BankSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -27,17 +27,6 @@ const BankSchema = new mongoose.Schema({
     enum: ["Point"],
     required: true,
   },
-  // location: {
-  //   type: {
-  //     type: String,
-  //     enum: ["Point"],
-  //     required: true,
-  //   },
-  //   coordinates: {
-  //     type: [Number],
-  //     required: true,
-  //   },
-  // },
   address: {
     type: String,
     required: true,
