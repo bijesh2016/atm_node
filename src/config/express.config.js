@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const router = require("./router.config");
+const { swaggerUi, swaggerSpec } = require('./swagger');
 require("./mongo.config")
 const app = express();
 
@@ -15,7 +16,9 @@ app.get('/test',(req,res)=>{
 
 app.use("/assets", express.static("./public/uploads"));
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+    
 app.use((req, res, next) => {
   next({
     code: 404,

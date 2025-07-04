@@ -61,7 +61,7 @@ class AuthMail {
   };
   notifyActivationSuccess = async (user) => {
     try {
-      const loginLink = `${AppConfig.appUrl}auth/login`;
+      const loginLink = `${AppConfig.appUrl}/auth/login/`;
       const emailTemplate = `
   <div style="font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; padding: 40px;">
     <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">

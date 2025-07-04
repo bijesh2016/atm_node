@@ -116,10 +116,52 @@ class bankController {
 
   branchesByBankSlug = async (req, res, next) => {
     try {
+        const bank = await BankSvc.getSingleRowByFilter({
+        slug: req.params.slug,
+      });
+      if (!bank) {
+        throw {
+          code: 422,
+          message: "Bank not found",
+          status: "NOT_FOUND",
+        };
+      }
+        const branches = await BankSvc.getSingleRowByFilter({
+        bank: bank._id,
+        status: Status.ACTIVE,
+      });
+      res.json({
+        data: branches,
+        message: "Bank branches",
+        status: "SUCCESS",
+        options: null,
+      });
     } catch (exception) {
       next(exception);
     }
   };
+
+  createBank = async (req, res, next) => {
+    try {
+      const createData = await BankSvc.createSingleData(req.body);
+      if (!createData) {
+        throw {
+          code: 422,
+          message: "Bank not created",
+          status: "NOT_CREATED",
+        };
+      }
+      res.json({
+        data: createData,
+        message: "Bank created",
+        status: "CREATED",
+        options: null,
+      });
+    } catch (exception) {
+      next(exception);
+    }
+  };
+
 }
 
 const bankCtrl = new bankController();

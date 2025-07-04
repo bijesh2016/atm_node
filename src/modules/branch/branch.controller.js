@@ -103,18 +103,59 @@ class branchController {
 
   branchDeleteById = async (req, res, next) => {
     try {
+      await this.#validateBranchById(req.params.id);
+      const deleteData = await BankSvc.deleteSingleDataByFilter({
+        _id: this.#BranchDetail._id,
+      });
+      res.json({
+        data: deleteData, 
+        message: "Branch deleted",
+        status: "SUCCESS",
+        options: null,
+      });
+    } catch (exception) {
+      next(exception);
+    }
+  };        
+
+  atmsByBranchId = async (req, res, next) => {
+    try { 
+      await this.#validateBranchById(req.params.id);
+      const deleteData = await BankSvc.deleteSingleDataByFilter({
+        _id: this.#BranchDetail._id,
+      });
+      res.json({
+        data: deleteData, 
+        message: "Branch deleted",
+        status: "SUCCESS",
+        options: null,
+      });
     } catch (exception) {
       next(exception);
     }
   };
 
-  atmsByBankSlug = async (req, res, next) => {
+  createBranch = async (req, res, next) => {
     try {
+      const createData = await BankSvc.createSingleData(req.body);
+      if (!createData) {
+        throw {
+          code: 422,
+          message: "Branch not created",
+          status: "NOT_CREATED",
+        };
+      }
+      res.json({
+        data: createData,
+        message: "Branch created",
+        status: "CREATED",
+        options: null,
+      });
     } catch (exception) {
       next(exception);
     }
   };
-}
+}             
 
 const branchCtrl = new branchController();
 module.exports = branchCtrl;

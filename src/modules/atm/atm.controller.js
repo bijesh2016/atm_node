@@ -25,7 +25,7 @@ class atmController {
       next(exception);
     }
   };
-
+  
   listAllAtm = async (req, res, next) => {
     try {
       let filter = {};
@@ -147,6 +147,28 @@ class atmController {
       next(exception);
     }
   };
+
+  createAtm = async (req, res, next) => {
+    try {
+      const createData = await AtmSvc.createSingleData(req.body);
+      if (!createData) {
+        throw {
+          code: 422,
+          message: "ATM not created",
+          status: "NOT_CREATED",
+        };
+      }
+      res.json({
+        data: createData,
+        message: "ATM created",
+        status: "CREATED",
+        options: null,
+      });
+    } catch (exception) {
+      next(exception);
+    }
+  };
+
 }
 
 const atmCtrl = new atmController();

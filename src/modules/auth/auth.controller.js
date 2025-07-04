@@ -93,60 +93,38 @@ class AuthController {
 
 
   login = async (req, res, next) => {
-    try {
-      const { email, password } = req.body;
+    try { 
+      const { email, password } = req.body; 
       const userInfo = await userSvc.getSingleRowByFilter({
         email: email,
-      });
+      });           
       if (!userInfo) {
         throw {
           code: 422,
           message: "User not registered yet",
           status: "USER_NOT_REGISTERED_YET",
+        } 
+      }
+      //bcrypt
+      const isPasswordValid = bcrypt.compareSync(password, userInfo.password);
+      if (!isPasswordValid) {
+        throw {
+          code: 422,
+          message: "Credentials do not match",
+          status: "CREDENTIALS_DONOT_MATCH",
+        };
+      }                 
+
+
+      if(userInfo.status!== Status.ACTIVE||userInfo.activationToken!==null){
+        throw{  
+          code:422,
+          message:"Account not activated yet",
+          status:"NOT_ACTIVATED"
         }
-      }
-      
-    //bcrypt
-    if(bcrypt.compareSync(password,userInfo)){
-      throw{
-        code:422,
-        message:'Crediantials doesnot match',
-        status:'CREDIANTIALS_DOESNOT_MATCH',
-      }
-    }
-
-    if(userInfo.status!== Status.ACTIVE||userInfo.activationToken!==null){
-      throw{
-        code:422,
-        message:"Account not activated yet",
-        status:"NOT_ACTIVATED"
-      }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
-      // if (
+      }               
+      //if account is not activated or activation token is not null 
+      // if (   
       //   userInfo.status !== Status.ACTIVE ||
       //   userInfo.activationToken != null
       // ) {
@@ -154,7 +132,7 @@ class AuthController {
       //     code: 422,
       //     message: "Account not activated yet",
       //     status: "ACCOUNT_NOT_ACTIVATED_YET",
-      //   };
+      //   };   
       // }
 
       // // Verify password
@@ -167,7 +145,7 @@ class AuthController {
       //   };
       // }
 
-      //jwt token
+      //jwt token 
       const accessToken = jwt.sign(
         {
           sub: userInfo._id,
@@ -179,22 +157,22 @@ class AuthController {
       const refreshToken = jwt.sign(
         {
           sub: userInfo._id,
-          type: "Refresh",
+          type: "Refresh",  
         },
         AppConfig.jwtSecret,
         { expiresIn: "5d" }
       );
 
-      // let sessionData = {
-      //   user: userInfo._id,
-      //   token: {
-      //     access: accessToken,
-      //     refresh: refreshToken,
-      //   },
-      //   accessDevice: "web",
-      //   ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
-      // };
-      // await authSvc.storeSession(sessionData);
+      let sessionData = {
+        user: userInfo._id,
+        token: {    
+          access: accessToken,
+          refresh: refreshToken,
+        },
+        accessDevice: "web",
+        ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
+      };
+      await authSvc.storeSession(sessionData);
       res.json({
         data: {
           accessToken: accessToken,
@@ -204,7 +182,7 @@ class AuthController {
         status: "LOGIN_SUCCESS",
         options: null,
       });
-    } catch (exception) {
+    } catch (exception) { 
       next(exception);
     }
   };
@@ -217,7 +195,7 @@ class AuthController {
         filter = {
           user: loggedInUser._id,
         };
-      } else {
+      } else {  
         const token = req.headers["authorization"]?.replace("Bearer ", "");
         filter = {
           user: loggedInUser._id,
@@ -229,7 +207,7 @@ class AuthController {
       res.json({
         message: "Logged out successfully",
         status: "LOGOUT_SUCCESSFUL",
-      });
+      }); 
     } catch (exception) {
       next(exception);
     }

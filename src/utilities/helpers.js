@@ -10,9 +10,9 @@ const randomStringGenerate=(length=100)=>{
     const chars='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     const len=chars.length
     let randomStr="";
-    for(let i=1;i<length;i++){
-        const posn=Math.ceil(Math.random()*(len-1))
-        randomStr=chars[posn]
+    for(let i=0;i<length;i++){
+        const posn=Math.floor(Math.random()*(len-1))
+        randomStr+=chars[posn]
     }
     return randomStr
 }
