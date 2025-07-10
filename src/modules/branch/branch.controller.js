@@ -1,4 +1,5 @@
-const BankSvc = require("../bank/bank.service");
+const BranchSvc = require("./branch.service");
+const { Status } = require("../../config/constant");
 
 class branchController {
   #BranchDetail;
@@ -13,7 +14,7 @@ class branchController {
           name: new RegExp(req.query.search, "i"),
         };
       }
-      let { data, pagination } = await Svc.getAllList(req.query, filter);
+      let { data, pagination } = await BranchSvc.getAllList(req.query, filter);
       res.json({
         data: data,
         message: "Branch List",
@@ -35,7 +36,7 @@ class branchController {
           name: new RegExp(req.query.search, "i"),
         };
       }
-      let { data, pagination } = await AtmSvc.getAllList(req.query, filter);
+      let { data, pagination } = await BranchSvc.getAllList(req.query, filter);
       res.json({
         data: data,
         message: "Branch List",
@@ -50,7 +51,7 @@ class branchController {
   };
 
   #validateBranchById = async (id) => {
-    this.#BranchDetail = await BankSvc.getSingleRowByFilter({
+    this.#BranchDetail = await BranchSvc.getSingleRowByFilter({
       _id: id,
     });
     if (!this.#BranchDetail) {
@@ -69,7 +70,7 @@ class branchController {
         data: this.#BranchDetail,
         message: "Branch detail",
         status: "SUCCESS",
-        option: null,
+        options: null,
       });
     } catch (exception) {
       next(exception);
@@ -79,11 +80,11 @@ class branchController {
   branchUpdateById = async (req, res, next) => {
     try {
       await this.#validateBranchById(req.params.id);
-      let payload = await BankSvc.transformUpdatePayload(
+      let payload = await BranchSvc.transformUpdatePayload(
         req,
         this.#BranchDetail
       );
-      const updateData = await BankSvc.updateSingleDataByFilter(
+      const updateData = await BranchSvc.updateSingleDataByFilter(
         {
           _id: this.#BranchDetail._id,
         },
@@ -92,7 +93,7 @@ class branchController {
       
       res.json({
         data: updateData,
-        message: "Bank Updated",
+        message: "Branch Updated",
         status: "SUCCESS",
         options: null,
       });
@@ -104,7 +105,7 @@ class branchController {
   branchDeleteById = async (req, res, next) => {
     try {
       await this.#validateBranchById(req.params.id);
-      const deleteData = await BankSvc.deleteSingleDataByFilter({
+      const deleteData = await BranchSvc.deleteSingleRowByFilter({
         _id: this.#BranchDetail._id,
       });
       res.json({
@@ -121,12 +122,10 @@ class branchController {
   atmsByBranchId = async (req, res, next) => {
     try { 
       await this.#validateBranchById(req.params.id);
-      const deleteData = await BankSvc.deleteSingleDataByFilter({
-        _id: this.#BranchDetail._id,
-      });
+      // For now, return empty ATMs array since we don't have ATM-branch relationship
       res.json({
-        data: deleteData, 
-        message: "Branch deleted",
+        data: [], 
+        message: "Branch ATMs",
         status: "SUCCESS",
         options: null,
       });
@@ -137,7 +136,23 @@ class branchController {
 
   createBranch = async (req, res, next) => {
     try {
-      const createData = await BankSvc.createSingleData(req.body);
+      // Transform the payload to handle the data properly
+      let payload = req.body;
+      
+      // Normalize status to lowercase to match enum values
+      if (payload.status) {
+        payload.status = payload.status.toLowerCase();
+      } else {
+        payload.status = Status.INACTIVE;
+      }
+      
+      // Set default services if not provided
+      if (!payload.services || payload.services.length === 0) {
+        payload.services = ["Loans", "Deposits"];
+      }
+      
+      // Create the branch
+      const createData = await BranchSvc.createBranch(payload);
       if (!createData) {
         throw {
           code: 422,
@@ -152,6 +167,7 @@ class branchController {
         options: null,
       });
     } catch (exception) {
+      console.error("Branch creation error:", exception);
       next(exception);
     }
   };

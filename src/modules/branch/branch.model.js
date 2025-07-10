@@ -13,13 +13,11 @@ const BranchSchema = new mongoose.Schema({
       unique: true,
     },
   latitude: {
-    type: String,
-    enum: ["Point"],
+    type: Number,
     required: true,
   },
   longitude: {
-    type: String,
-    enum: ["Point"],
+    type: Number,
     required: true,
   },
   bank: {
@@ -42,6 +40,18 @@ const BranchSchema = new mongoose.Schema({
     enum: Object.values(Status),
     default: Status.INACTIVE,
   },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
+  },
+  updatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
+  }
+}, {
+  timestamps: true
 });
 
 const BranchModel = mongoose.model("Branch", BranchSchema);

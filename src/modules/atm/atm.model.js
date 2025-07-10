@@ -10,7 +10,6 @@ const AtmSchema = new mongoose.Schema({
   bank: {
     type: String,
     required: true,
-    unique: true,
   },
    slug: {
       type: String,
@@ -19,14 +18,12 @@ const AtmSchema = new mongoose.Schema({
     },
 
   latitude:{
-    type:String,
-    enum:["Point"],
-    required:true,
+    type: Number,
+    required: true,
   },
   longitude:{
-    type:String,
-    enum:["Point"],
-    required:true,
+    type: Number,
+    required: true,
   },
   address: {
     type: String,
@@ -43,7 +40,19 @@ const AtmSchema = new mongoose.Schema({
     min:3,
     max:100,
     required:true,
-  }]
+  }],
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
+  },
+  updatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
+  }
+}, {
+  timestamps: true
 });
 
 const AtmModel = mongoose.model("Atm", AtmSchema);

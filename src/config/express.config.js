@@ -1,9 +1,25 @@
 const express = require("express");
 const multer = require("multer");
+const cors = require("cors");
 const router = require("./router.config");
 const { swaggerUi, swaggerSpec } = require('./swagger');
 require("./mongo.config")
 const app = express();
+
+// CORS configuration
+const corsOptions = {
+  origin: [
+    'http://localhost:3000', // React development server
+    'http://localhost:5173', // Vite development server
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5173'
+  ],
+  credentials: true, // Allow cookies and authentication headers
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -12,13 +28,14 @@ app.use(express.urlencoded({ extended: true }))
 app.use("/api/atm_locator/", router);
 app.get('/test',(req,res)=>{
        console.log('testin')
+       res.json({ message: 'CORS is working!', timestamp: new Date().toISOString() });
 })
 
 app.use("/assets", express.static("./public/uploads"));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-    
+
 app.use((req, res, next) => {
   next({
     code: 404,

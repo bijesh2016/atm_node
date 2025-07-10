@@ -1,6 +1,9 @@
 const express = require('express');
 const bankRouter = express.Router();
 const bankCtrl=require("./bank.controller");
+const uploader = require('../../middlewares/file-upload.middleware');
+const bodyValidator = require('../../middlewares/validator.middleware');
+const {AddBankDTD}=require("../../modules/bank/bank.validator")
 
 /**
  * @swagger
@@ -22,11 +25,15 @@ bankRouter.get("/for-home",bankCtrl.banksForHome);
  *   get:
  *     summary: Get all banks
  *     tags: [Bank]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of banks
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Bank'
  */
 bankRouter.get('/',bankCtrl.listAllBank);
 
@@ -38,9 +45,20 @@ bankRouter.get('/',bankCtrl.listAllBank);
  *     tags: [Bank]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bank ID
  *     responses:
  *       200:
  *         description: Bank detail
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Bank'
  */
 bankRouter.get('/:id',bankCtrl.bankDetailById);
 
@@ -49,23 +67,47 @@ bankRouter.get('/:id',bankCtrl.bankDetailById);
  * /bank/{id}:
  *   put:
  *     summary: Update bank by id
- *     tags: [Bank] 
+ *     tags: [Bank]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bank ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Bank'
  *     responses:
  *       200:
  *         description: Bank updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Bank'
  */
-bankRouter.put('/:id',bankCtrl.bankUpdateById);
+bankRouter.put('/:id',uploader('single').single('image'),bodyValidator(AddBankDTD),bankCtrl.bankUpdateById);
 
 /**
  * @swagger
  * /bank/{id}:
  *   delete:
  *     summary: Delete bank by id
- *     tags: [Bank] 
+ *     tags: [Bank]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bank ID
  *     responses:
  *       200:
  *         description: Bank deleted
@@ -94,10 +136,20 @@ bankRouter.get('/branches/:slug',bankCtrl.branchesByBankSlug);
  *     tags: [Bank]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Bank'
  *     responses:
  *       200:
-*         description: Bank created
-*/ 
+ *         description: Bank created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Bank'
+ */
 bankRouter.post('/',bankCtrl.createBank);
 
 module.exports =bankRouter;

@@ -77,7 +77,7 @@ authRouter.post("/me",checkLogin,authCtrl.getLoggedInUserProfile)
 /**
  * @swagger
  * /auth/logout:
- *   post:  
+ *   patch:  
  *     summary: Logout user
  *     tags: [Auth]
  *     security:
@@ -86,6 +86,6 @@ authRouter.post("/me",checkLogin,authCtrl.getLoggedInUserProfile)
  *       200:
     *         description: Logout successful
  */
-authRouter.post("/logout",checkLogin,authCtrl.logout)
+authRouter.patch("/logout",checkLogin,authCtrl.logout)
 
 module.exports=authRouter

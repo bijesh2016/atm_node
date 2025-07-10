@@ -1,4 +1,4 @@
-const joi=require('joi')
+const Joi=require('joi')
 const phonePattern=/^(?:\+977[-\s]?)?(?:9[6-8]\d{8}|0[1-9]\d{7})$/;
 const latitudePattern=/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
 const longitudePattern=/^[-+]?((1[0-7]\d|[1-9]?\d)(\.\d+)?|180(\.0+)?)$/;

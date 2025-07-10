@@ -17,7 +17,6 @@ const myStorage = multer.diskStorage({
   }
 })
 
-
 const uploader = (filetype = 'image') => {
   let allowExts = ['jpg','jpeg','png','bmp','webp','svg','gif'];
   let limit = 8 * 1024 * 1024;

@@ -1,4 +1,6 @@
 const AtmSvc = require("./atm.service");
+const { Status } = require("../../config/constant");
+
 class atmController {
   #AtmDetail;
   atmsForHome = async (req, res, next) => {
@@ -49,7 +51,7 @@ class atmController {
   };
 
   #validateAtmById = async (id) => {
-    this.#AtmDetail = awaitAtmSvc.getSingleRowByFilter({
+    this.#AtmDetail = await AtmSvc.getSingleRowByFilter({
       _id: id,
     });
     if (!this.#AtmDetail) {
@@ -129,19 +131,15 @@ class atmController {
         };
       }
 
-      let { data, pagination } = await productSvc.getAllList(req.query, {
-        Atm: this.#AtmDetail._id,
-        status: Status.ACTIVE,
-      });
-
+      // For now, return empty branches array since we don't have branch-ATM relationship
       res.json({
         data: {
           detail: this.#AtmDetail,
-          product: data,
+          branches: [],
         },
-        message: "Branch detail",
-        status: "BRANCH_DETAIL_SUCCESS",
-        options: { pagination },
+        message: "ATM detail",
+        status: "SUCCESS",
+        options: null,
       });
     } catch (exception) {
       next(exception);
@@ -150,7 +148,23 @@ class atmController {
 
   createAtm = async (req, res, next) => {
     try {
-      const createData = await AtmSvc.createSingleData(req.body);
+      // Transform the payload to handle the data properly
+      let payload = req.body;
+      
+      // Normalize status to lowercase to match enum values
+      if (payload.status) {
+        payload.status = payload.status.toLowerCase();
+      } else {
+        payload.status = Status.INACTIVE;
+      }
+      
+      // Set default branch if not provided
+      if (!payload.branch || payload.branch.length === 0) {
+        payload.branch = ["Main Branch"];
+      }
+      
+      // Create the ATM
+      const createData = await AtmSvc.createAtm(payload);
       if (!createData) {
         throw {
           code: 422,
@@ -165,6 +179,7 @@ class atmController {
         options: null,
       });
     } catch (exception) {
+      console.error("ATM creation error:", exception);
       next(exception);
     }
   };

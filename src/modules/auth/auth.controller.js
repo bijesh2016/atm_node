@@ -1,13 +1,13 @@
 const userSvc = require("../../modules/user/user.service");
 const authSvc = require("./auth.service");
 const authMailSvc = require("./auth.mail");
-const {AppConfig}=require("../../config/config")
-const jwt=require("jsonwebtoken")
-const bcrypt=require("bcryptjs")
-const EmailSvc=require("../../services/mail.service")
-const {randomStringGenerate}=require("../../utilities/helpers")
-const {Status}=require("../../config/constant")
-const uploader=require("../../middlewares/file-upload.middleware")
+const {AppConfig}=require("../../config/config");
+const jwt=require("jsonwebtoken");
+const bcrypt=require("bcryptjs");
+const EmailSvc=require("../../services/mail.service");
+const {randomStringGenerate}=require("../../utilities/helpers");
+const {Status}=require("../../config/constant");
+const uploader=require("../../middlewares/file-upload.middleware");
 class AuthController {
   registerUser = async (req, res, next) => {
     try {

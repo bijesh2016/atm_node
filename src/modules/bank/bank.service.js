@@ -1,6 +1,7 @@
 const fileUploadSvc = require("../../services/fileupload.service");
 const slugify = require("slugify");
 const BankModel = require("./bank.model");
+const mongoose = require('mongoose');
 
 class BankService {
   transformCreatePayload = async (req) => {
@@ -21,6 +22,9 @@ class BankService {
 
   transformUpdatePayload = async (req, oldData) => {
     try {
+      if (!oldData) {
+        throw new Error('No existing bank data found for update.');
+      }
       let data = req.body;
       // if (req.file) {
       //   data.image = await fileUploadSvc.fileupload(req.file.path, "Atm/");

@@ -1,3 +1,6 @@
+const BankSvc = require("./bank.service");
+const { Status } = require("../../config/constant");
+
 class bankController {
   #BankDetail;
   banksForHome = async (req, res, next) => {
@@ -11,7 +14,7 @@ class bankController {
           name: new RegExp(req.query.search, "i"),
         };
       }
-      let { data, pagination } = await AtmSvc.getAllList(req.query, filter);
+      let { data, pagination } = await BankSvc.getAllList(req.query, filter);
       res.json({
         data: data,
         message: "Bank List",
@@ -33,7 +36,7 @@ class bankController {
           name: new RegExp(req.query.search, "i"),
         };
       }
-      let { data, pagination } = await AtmSvc.getAllList(req.query, filter);
+      let { data, pagination } = await BankSvc.getAllList(req.query, filter);
       res.json({
         data: data,
         message: "Bank List",
@@ -77,13 +80,26 @@ class bankController {
   bankUpdateById = async (req, res, next) => {
     try {
       await this.#validateBankById(req.params.id);
-      let payload = await AtmSvc.transformUpdatePayload(req, this.#BankDetail);
-      const updateData = await AtmSvc.updateSingleDataByFilter(
-        {
-          _id: this.#BankDetail._id,
-        },
-        payload
-      );
+      if (!this.#BankDetail) {
+        return res.status(404).json({ message: 'Bank not found' });
+      }
+      let payload;
+      try {
+        payload = await BankSvc.transformUpdatePayload(req, this.#BankDetail);
+      } catch (err) {
+        return res.status(400).json({ message: err.message || 'Invalid update payload' });
+      }
+      let updateData;
+      try {
+        updateData = await BankSvc.updateSingleDataByFilter(
+          {
+            _id: this.#BankDetail._id,
+          },
+          payload
+        );
+      } catch (err) {
+        return res.status(400).json({ message: err.message || 'Failed to update bank' });
+      }
       res.json({
         data: updateData,
         message: "Bank Updated",
@@ -99,7 +115,7 @@ class bankController {
     try {
       await this.#validateBankById(req.params.id);
 
-      const del = await AtmSvc.deleteSingleRowByFilter({
+      const del = await BankSvc.deleteSingleRowByFilter({
         _id: this.#BankDetail._id,
       });
 
@@ -143,7 +159,26 @@ class bankController {
 
   createBank = async (req, res, next) => {
     try {
-      const createData = await BankSvc.createSingleData(req.body);
+      // Transform the payload to handle the data properly
+      let payload = req.body;
+      
+      // Normalize status to lowercase to match enum values
+      if (payload.status) {
+        payload.status = payload.status.toLowerCase();
+      } else {
+        payload.status = Status.INACTIVE;
+      }
+      
+      // Set default branch if not provided
+      if (!payload.branch) {
+        payload.branch = "Main Branch";
+      }
+      
+      // Create the bank
+      const createData = await BankSvc.createBank({
+        ...payload,
+        code: payload.code,
+      });
       if (!createData) {
         throw {
           code: 422,
@@ -158,6 +193,7 @@ class bankController {
         options: null,
       });
     } catch (exception) {
+      console.error("Bank creation error:", exception);
       next(exception);
     }
   };

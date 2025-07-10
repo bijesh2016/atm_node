@@ -1,0 +1,463 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "ATM Locator API",
+    "description": "API documentation for your ATM Locator backend",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/api/atm_locator",
+  "schemes": [
+    "http"
+  ],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer",
+      "bearerFormat": "JWT"
+    }
+  },
+  "paths": {
+    "/register": {
+      "post": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/activate/{token}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-forwarded-for",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/me": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "logoutFromAll",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/for-home": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/{slug}/branches": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/branches/{slug}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/atms/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "RegisterUser": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "John Doe"
+        },
+        "email": {
+          "type": "string",
+          "example": "john@example.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "password123"
+        },
+        "role": {
+          "type": "string",
+          "example": "customer"
+        },
+        "gender": {
+          "type": "string",
+          "example": "male"
+        },
+        "address": {
+          "type": "string",
+          "example": "123 Main St"
+        },
+        "dob": {
+          "type": "string",
+          "example": "1990-01-01"
+        },
+        "phone": {
+          "type": "string",
+          "example": "1234567890"
+        }
+      }
+    },
+    "LoginUser": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "john@example.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "password123"
+        }
+      }
+    },
+    "ATM": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "ATM 1"
+        },
+        "bank": {
+          "type": "string",
+          "example": "Bank 1"
+        },
+        "slug": {
+          "type": "string",
+          "example": "atm-1"
+        },
+        "latitude": {
+          "type": "string",
+          "example": "27.123"
+        },
+        "longitude": {
+          "type": "string",
+          "example": "85.123"
+        },
+        "address": {
+          "type": "string",
+          "example": "ATM Address"
+        },
+        "phone": {
+          "type": "string",
+          "example": "1234567890"
+        },
+        "status": {
+          "type": "string",
+          "example": "active"
+        },
+        "branch": {
+          "type": "array",
+          "example": [
+            "branch-1"
+          ],
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Bank": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Bank 1"
+        },
+        "slug": {
+          "type": "string",
+          "example": "bank-1"
+        },
+        "email": {
+          "type": "string",
+          "example": "bank1@example.com"
+        },
+        "latitude": {
+          "type": "string",
+          "example": "27.123"
+        },
+        "longitude": {
+          "type": "string",
+          "example": "85.123"
+        },
+        "address": {
+          "type": "string",
+          "example": "Bank Address"
+        },
+        "phone": {
+          "type": "number",
+          "example": 1234567890
+        },
+        "status": {
+          "type": "string",
+          "example": "active"
+        },
+        "branch": {
+          "type": "string",
+          "example": "branch-1"
+        },
+        "website": {
+          "type": "string",
+          "example": "https://bank1.com"
+        }
+      }
+    },
+    "Branch": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Branch 1"
+        },
+        "slug": {
+          "type": "string",
+          "example": "branch-1"
+        },
+        "latitude": {
+          "type": "string",
+          "example": "27.123"
+        },
+        "longitude": {
+          "type": "string",
+          "example": "85.123"
+        },
+        "bank": {
+          "type": "string",
+          "example": "Bank 1"
+        },
+        "services": {
+          "type": "array",
+          "example": [
+            "service1",
+            "service2"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "address": {
+          "type": "string",
+          "example": "Branch Address"
+        },
+        "phone": {
+          "type": "string",
+          "example": "1234567890"
+        },
+        "status": {
+          "type": "string",
+          "example": "active"
+        }
+      }
+    }
+  }
+}
