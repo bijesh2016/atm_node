@@ -161,19 +161,30 @@ class bankController {
     try {
       // Transform the payload to handle the data properly
       let payload = req.body;
-      
       // Normalize status to lowercase to match enum values
       if (payload.status) {
         payload.status = payload.status.toLowerCase();
       } else {
         payload.status = Status.INACTIVE;
       }
-      
       // Set default branch if not provided
       if (!payload.branch) {
         payload.branch = "Main Branch";
       }
-      
+      // Duplicate check
+      const existingBank = await BankSvc.getSingleRowByFilter({
+        $or: [
+          { name: payload.name },
+          { code: payload.code },
+          { email: payload.email }
+        ]
+      });
+      if (existingBank) {
+        return res.status(400).json({
+          message: "A bank with the same name, code, or email already exists.",
+          status: "DUPLICATE_BANK"
+        });
+      }
       // Create the bank
       const createData = await BankSvc.createBank({
         ...payload,

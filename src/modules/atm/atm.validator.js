@@ -4,15 +4,17 @@ const latitudePattern=/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
 const longitudePattern=/^[-+]?((1[0-7]\d|[1-9]?\d)(\.\d+)?|180(\.0+)?)$/;
 
 const AddAtmDTD=Joi.object({
-    name:Joi.string().min(2).max(100),
-    address:Joi.string().allow(null,"").optional().default(null),
+    name:Joi.string().min(2).max(250).required(),
+    address:Joi.string().min(3).max(150).required(),
     phone:Joi.string().allow(null,'').pattern(phonePattern).optional(),
     bank:Joi.string().required(),
-    latitude:Joi.string().required().pattern(latitudePattern),
-    longitude:Joi.string().required().pattern(longitudePattern),
-    address:Joi.string().required().min(3).max(150),
-    status:Joi.string().regex(/^(active||inactive||pending)$/).default('inactive').required(),
-    branch:Joi.string().required(),
+    latitude:Joi.number().required().min(-90).max(90),
+    longitude:Joi.number().required().min(-180).max(180),
+    status:Joi.string().regex(/^(active|inactive|pending)$/).default('inactive').required(),
+    branch:Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string())
+    ).required(),
 })
 
-module.export={AddAtmDTD};
+module.exports = { AddAtmDTD };

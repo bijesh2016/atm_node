@@ -151,6 +151,10 @@ class atmController {
       // Transform the payload to handle the data properly
       let payload = req.body;
       
+      // Parse numeric fields if present (handles FormData string values)
+      if (payload.latitude !== undefined) payload.latitude = Number(payload.latitude);
+      if (payload.longitude !== undefined) payload.longitude = Number(payload.longitude);
+      
       // Normalize status to lowercase to match enum values
       if (payload.status) {
         payload.status = payload.status.toLowerCase();

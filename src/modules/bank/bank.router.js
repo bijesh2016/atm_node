@@ -4,6 +4,7 @@ const bankCtrl=require("./bank.controller");
 const uploader = require('../../middlewares/file-upload.middleware');
 const bodyValidator = require('../../middlewares/validator.middleware');
 const {AddBankDTD}=require("../../modules/bank/bank.validator")
+const Bank = require('./bank.model');
 
 /**
  * @swagger
@@ -91,7 +92,7 @@ bankRouter.get('/:id',bankCtrl.bankDetailById);
  *             schema:
  *               $ref: '#/components/schemas/Bank'
  */
-bankRouter.put('/:id',uploader('single').single('image'),bodyValidator(AddBankDTD),bankCtrl.bankUpdateById);
+bankRouter.post('/:id',uploader('single').single('image'),bodyValidator(AddBankDTD),bankCtrl.bankUpdateById);
 
 /**
  * @swagger
@@ -151,5 +152,33 @@ bankRouter.get('/branches/:slug',bankCtrl.branchesByBankSlug);
  *               $ref: '#/components/schemas/Bank'
  */
 bankRouter.post('/',bankCtrl.createBank);
+
+/**
+ * @swagger
+ * /bank/count:
+ *   get:
+ *     summary: Get total number of banks
+ *     tags: [Bank]
+ *     responses:
+ *       200:
+ *         description: Total number of banks
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   description: Total number of banks
+ */
+// GET /count - returns the total number of banks
+bankRouter.get('/count', async (req, res) => {
+  try {
+    const count = await Bank.countDocuments();
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to get bank count' });
+  }
+});
 
 module.exports =bankRouter;

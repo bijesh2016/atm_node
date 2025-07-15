@@ -1,6 +1,7 @@
 const express = require('express');
 const branchRouter = express.Router();
 const branchCtrl=require('./branch.controller')
+const Branch = require('./branch.model');
 
 /**
  * @swagger
@@ -148,6 +149,33 @@ branchRouter.get('/atms/:id',branchCtrl.atmsByBranchId);
  *               $ref: '#/components/schemas/Branch'
  */ 
 branchRouter.post('/',branchCtrl.createBranch);
+
+/**
+ * @swagger
+ * /branch/count:
+ *   get:
+ *     summary: Get total number of branches
+ *     tags: [Branch]
+ *     responses:
+ *       200:
+ *         description: Total number of branches
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   description: Total number of branches
+ */
+branchRouter.get('/count', async (req, res) => {
+  try {
+    const count = await Branch.countDocuments();
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to get branch count' });
+  }
+});
 
 
 module.exports = branchRouter;

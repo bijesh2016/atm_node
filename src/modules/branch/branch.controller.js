@@ -36,6 +36,10 @@ class branchController {
           name: new RegExp(req.query.search, "i"),
         };
       }
+      // Add filtering by bankId
+      if (req.query.bankId) {
+        filter.bank = req.query.bankId;
+      }
       let { data, pagination } = await BranchSvc.getAllList(req.query, filter);
       res.json({
         data: data,

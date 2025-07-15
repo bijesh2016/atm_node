@@ -26,13 +26,15 @@ class BankService {
         throw new Error('No existing bank data found for update.');
       }
       let data = req.body;
-      // if (req.file) {
-      //   data.image = await fileUploadSvc.fileupload(req.file.path, "Atm/");
-      // } else {
-      //   data.image = oldData.image;
-      // }
 
-      data.updatedBy = req.loggedInUser._id;
+      // Save local file path if file is present
+      if (req.file) {
+        data.image = '/public/' + req.file.filename;
+      } else {
+        data.image = oldData.image;
+      }
+
+      // data.updatedBy = req.loggedInUser._id;
       return data;
     } catch (exception) {
       throw exception;
@@ -54,12 +56,22 @@ class BankService {
       let page = +query.page || 1;
       let skip = (page - 1) * limit;
 
-      let allData = await BankModel.find(filter)
-        .populate("createdBy", ["_id", "name"])
-        .populate("updatedBy", ["_id", "name"])
-        .sort({ createdAt: "desc" })
-        .skip(skip)
-        .limit(limit);
+      // Aggregation to embed branches by bank _id
+      let allData = await BankModel.aggregate([
+        { $match: filter },
+        {
+          $lookup: {
+            from: "branches", // MongoDB collection name (should be plural)
+            localField: "_id",
+            foreignField: "bank",
+            as: "branches"
+          }
+        },
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit }
+      ]);
+
       let count = await BankModel.countDocuments(filter);
       return {
         data: allData,

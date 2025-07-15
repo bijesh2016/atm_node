@@ -9,9 +9,9 @@ class BranchService {
       data.slug = slugify(data.name.replace("'", "").replace('"', ""), {
         lower: true,
       });
-      // if (req.file) {
-      //   data.image = await fileUploadSvc.fileupload(req.file.path, "Atm/");
-      // }
+      if (req.file) {
+        data.image = '/public/' + req.file.filename;
+      }
       data.createdBy = req.loggedInUser._id;
       return data;
     } catch (exception) {
@@ -22,11 +22,11 @@ class BranchService {
   transformUpdatePayload = async (req, oldData) => {
     try {
       let data = req.body;
-      // if (req.file) {
-      //   data.image = await fileUploadSvc.fileupload(req.file.path, "Atm/");
-      // } else {
-      //   data.image = oldData.image;
-      // }
+      if (req.file) {
+        data.image = '/public/' + req.file.filename;
+      } else {
+        data.image = oldData?.image || null;
+      }
 
       data.updatedBy = req.loggedInUser._id;
       return data;

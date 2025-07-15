@@ -13,6 +13,7 @@ class FileUploadService{
     }
 }
 
-const fileUploadSvc=new FileUploadService(
+const fileUploadSvc = new FileUploadService(
     new cloudinaryService()
-)
+);
+module.exports = fileUploadSvc;

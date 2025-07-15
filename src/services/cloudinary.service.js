@@ -4,10 +4,11 @@ const { deleteFile } = require("../utilities/helpers");
 
 class CloudinaryService {
   constructor() {
+    // console.log("CloudinaryConfig:", CloudinaryConfig);
     cloudinary.config({
       cloud_name: CloudinaryConfig.cloudName,
       api_key: CloudinaryConfig.apiKey,
-      api_secret: CloudinaryConfig.api_secret,
+      api_secret: CloudinaryConfig.apiSecret,
     });
   }
   fileupload = async (filepath, dir = "/") => {
@@ -16,7 +17,7 @@ class CloudinaryService {
         filepath,
         {
           unique_filename: true,
-          folder: "mern_project" + dir,
+          folder: `mern_project/${dir.replace(/^\/+/, "")}`,
         }
       );
 

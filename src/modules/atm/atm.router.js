@@ -2,8 +2,9 @@ const express = require('express');
 const atmRouter = express.Router();
 const atmCtrl = require("./atm.controller");
 const uploader=require("../../middlewares/file-upload.middleware")
-const {bodyValidator}= require('../../middlewares/validator.middleware');
+const bodyValidator = require('../../middlewares/validator.middleware');
 const {AddATMDTD}=require("../atm/atm.validator")
+const Atm = require('./atm.model');
 /**
  * @swagger
  * /atm/for-home:
@@ -168,6 +169,35 @@ atmRouter.delete('/:id', atmCtrl.atmDeleteById);
  *             schema:
  *               $ref: '#/components/schemas/ATM'
  */
-atmRouter.post('/',atmCtrl.createAtm);
+atmRouter.post('/', bodyValidator(AddATMDTD), atmCtrl.createAtm);
+
+// GET /count - returns the total number of ATMs
+atmRouter.get('/count', async (req, res) => {
+  try {
+    const count = await Atm.countDocuments();
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to get ATM count' });
+  }
+});
+
+/**
+ * @swagger
+ * /atm/count:
+ *   get:
+ *     summary: Get total number of ATMs
+ *     tags: [ATMs]
+ *     responses:
+ *       200:
+ *         description: Total number of ATMs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   description: Total number of ATMs
+ */
 
 module.exports = atmRouter;
