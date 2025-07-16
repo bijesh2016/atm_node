@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const uploader = require('../../middlewares/file-upload.middleware');
+const userSvc = require('./user.service');
 const User = require('./user.model');
 
 /**
@@ -27,6 +29,39 @@ router.get('/count', async (req, res) => {
     res.json({ count });
   } catch (err) {
     res.status(500).json({ error: 'Failed to get user count' });
+  }
+});
+
+// Profile image upload route
+router.post('/upload-profile-image/:userId', uploader('image').single('image'), async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file uploaded' });
+    }
+    // Optionally, upload to cloud storage here and get URLs
+    // For now, use local file path
+    const imageUrl = `/public/${req.file.filename}`;
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        image: {
+          publicId: req.file.filename,
+          url: imageUrl,
+          thumbUrl: imageUrl // For demo, use same as url
+        }
+      },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({
+      message: 'Profile image updated',
+      image: user.image
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to upload profile image' });
   }
 });
 

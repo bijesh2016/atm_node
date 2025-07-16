@@ -109,12 +109,13 @@ class branchController {
   branchDeleteById = async (req, res, next) => {
     try {
       await this.#validateBranchById(req.params.id);
-      const deleteData = await BranchSvc.deleteSingleRowByFilter({
-        _id: this.#BranchDetail._id,
-      });
+      const update = await BranchSvc.updateSingleDataByFilter(
+        { _id: this.#BranchDetail._id },
+        { status: Status.INACTIVE }
+      );
       res.json({
-        data: deleteData, 
-        message: "Branch deleted",
+        data: update,
+        message: "Branch marked as inactive ",
         status: "SUCCESS",
         options: null,
       });
@@ -140,22 +141,17 @@ class branchController {
 
   createBranch = async (req, res, next) => {
     try {
-      // Transform the payload to handle the data properly
       let payload = req.body;
-      
-      // Normalize status to lowercase to match enum values
       if (payload.status) {
         payload.status = payload.status.toLowerCase();
       } else {
         payload.status = Status.INACTIVE;
       }
       
-      // Set default services if not provided
       if (!payload.services || payload.services.length === 0) {
         payload.services = ["Loans", "Deposits"];
       }
       
-      // Create the branch
       const createData = await BranchSvc.createBranch(payload);
       if (!createData) {
         throw {

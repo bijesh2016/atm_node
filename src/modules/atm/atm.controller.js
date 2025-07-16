@@ -101,14 +101,13 @@ class atmController {
   atmDeleteById = async (req, res, next) => {
     try {
       await this.#validateAtmById(req.params.id);
-
-      const del = await AtmSvc.deleteSingleRowByFilter({
-        _id: this.#AtmDetail._id,
-      });
-
+      const update = await AtmSvc.updateSingleDataByFilter(
+        { _id: this.#AtmDetail._id },
+        { status: Status.INACTIVE }
+      );
       res.json({
-        data: del,
-        message: "ATM deleted successfully",
+        data: update,
+        message: "ATM marked as inactive (soft deleted)",
         status: "SUCCESS",
         options: null,
       });

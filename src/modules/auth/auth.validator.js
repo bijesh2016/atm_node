@@ -20,4 +20,17 @@ const LoginDTD = Joi.object({
   password: Joi.string().required(),
 });
 
-module.exports = { registerUserDTD, LoginDTD };
+const ForgotPasswordDTD = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+const ChangePasswordDTD = Joi.object({
+  oldPassword: Joi.string().required(),
+  newPassword: Joi.string().pattern(strongPasswordPattern).required().messages({
+    "string.pattern.base":
+      "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.",
+  }),
+  confirmPassword: Joi.ref("newPassword"),
+});
+
+module.exports = { registerUserDTD, LoginDTD, ForgotPasswordDTD, ChangePasswordDTD };

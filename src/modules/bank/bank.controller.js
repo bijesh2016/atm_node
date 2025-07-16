@@ -114,14 +114,14 @@ class bankController {
   bankDeleteById = async (req, res, next) => {
     try {
       await this.#validateBankById(req.params.id);
-
-      const del = await BankSvc.deleteSingleRowByFilter({
-        _id: this.#BankDetail._id,
-      });
-
+      // Soft delete: set status to inactive
+      const update = await BankSvc.updateSingleDataByFilter(
+        { _id: this.#BankDetail._id },
+        { status: Status.INACTIVE }
+      );
       res.json({
-        data: del,
-        message: "Bank deleted successfully",
+        data: update,
+        message: "Bank marked as inactive (soft deleted)",
         status: "SUCCESS",
         options: null,
       });

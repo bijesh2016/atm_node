@@ -27,7 +27,6 @@ class BankService {
       }
       let data = req.body;
 
-      // Save local file path if file is present
       if (req.file) {
         data.image = '/public/' + req.file.filename;
       } else {
@@ -61,7 +60,7 @@ class BankService {
         { $match: filter },
         {
           $lookup: {
-            from: "branches", // MongoDB collection name (should be plural)
+            from: "branches", 
             localField: "_id",
             foreignField: "bank",
             as: "branches"

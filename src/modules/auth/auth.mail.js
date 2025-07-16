@@ -109,6 +109,53 @@ class AuthMail {
       throw exception;
     }
   };
+  notifyPasswordReset = async (user) => {
+    try {
+      const resetLink = `${AppConfig.appUrl}/reset-password/${user.resetPasswordToken}`;
+      const emailTemplate = `
+  <div style="font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; padding: 40px;">
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+      <!-- Header -->
+      <div style="background-color: #dc3545; color: #ffffff; padding: 30px 20px; text-align: center;">
+        <h1 style="margin: 0;">ATM Locator</h1>
+        <p style="margin: 5px 0 0;">Password Reset Request</p>
+      </div>
+      <!-- Body -->
+      <div style="padding: 30px 20px;">
+        <h2 style="color: #333;">Hi ${user.name || user.email},</h2>
+        <p style="font-size: 16px; color: #555;">
+          We received a request to reset your password for your <strong>ATM Locator</strong> account.
+        </p>
+        <p style="font-size: 16px; color: #555;">
+          Click the button below to reset your password. This link will expire in <strong>1 hour</strong>.
+        </p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${resetLink}" style="background-color: #dc3545; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-size: 16px;">
+            Reset Password
+          </a>
+        </div>
+        <p style="font-size: 14px; color: #999;">
+          If you did not request a password reset, you can safely ignore this email.
+        </p>
+      </div>
+      <!-- Footer -->
+      <div style="background-color: #f1f1f1; color: #888; text-align: center; padding: 20px; font-size: 13px;">
+        &copy; ${new Date().getFullYear()} ATM Locator. All rights reserved.<br/>
+        <a href="#" style="color: #dc3545; text-decoration: none;">Visit our website</a> | 
+        <a href="#" style="color: #dc3545; text-decoration: none;">Contact Support</a>
+      </div>
+    </div>
+  </div>
+`;
+      await this.svc.sendEmail({
+        to: user.email,
+        sub: "Reset your ATM Locator password",
+        message: emailTemplate,
+      });
+    } catch (exception) {
+      throw exception;
+    }
+  };
 }
 const AuthMailSvc = new AuthMail();
 module.exports = AuthMailSvc;

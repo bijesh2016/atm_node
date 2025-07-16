@@ -12,7 +12,7 @@ class AtmService {
       if (req.file) {
         data.image = '/public/' + req.file.filename;
       }
-      data.createdBy = req.loggedInUser._id;
+      // data.createdBy = req.loggedInUser._id;
       return data;
     } catch (exception) {
       throw exception;
@@ -28,7 +28,7 @@ class AtmService {
         data.image = oldData?.image || null;
       }
 
-      data.updatedBy = req.loggedInUser._id;
+      // data.updatedBy = req.loggedInUser._id;
       return data;
     } catch (exception) {
       throw exception;

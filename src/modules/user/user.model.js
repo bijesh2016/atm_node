@@ -18,6 +18,10 @@ const UserSchema=new mongoose.Schema({
         required:true,
         unique:true,
     },
+    phone:{
+        type:String,
+        required:true
+    },
     role:{
         type:String,
         enum:Object.values(UserRoles),
@@ -28,25 +32,29 @@ const UserSchema=new mongoose.Schema({
         enum:["male", "female", "others"],
         required:true
     },
-    address:String,
-    dob:Date,
-    phone:String,
+    address:{
+        type:String,
+        default: ''
+    },
+    dob:{
+        type:Date
+    },
+    image:{
+        publicId:String,
+        url:String,
+        thumbUrl:String
+    },
     status:{
         type:String,
         enum:Object.values(Status),
         default:Status.INACTIVE
     },
     activationToken:String,
-    expiryTime:Date,
-    image:{
-        publicId:String,
-        url:String,
-        thumbUrl:String
-    }
-    },{
-        timestamps:true,
-        autoCreate:true,
-        autoIndex:true
-    })
+    expiryTime:Date
+},{
+    timestamps:true,
+    autoCreate:true,
+    autoIndex:true
+})
 const UserModel=mongoose.model("User",UserSchema)
 module.exports=UserModel

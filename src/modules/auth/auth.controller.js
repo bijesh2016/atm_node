@@ -187,6 +187,68 @@ class AuthController {
     }
   };
 
+  forgotPassword = async (req, res, next) => {
+    try {
+      const { email } = req.body;
+      const user = await userSvc.getSingleRowByFilter({ email });
+      if (!user) {
+        throw {
+          code: 404,
+          message: "User not found",
+          status: "USER_NOT_FOUND",
+        };
+      }
+      // Generate reset token and expiry
+      const resetToken = randomStringGenerate(48);
+      user.resetPasswordToken = resetToken;
+      user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+      await user.save();
+      // Removed direct email sending from controller
+      res.json({
+        data: {},
+        message: "Password reset link generated.",
+        status: "FORGOT_PASSWORD_SUCCESS",
+        option: null,
+      });
+    } catch (exception) {
+      next(exception);
+    }
+  };
+
+  changePassword = async (req, res, next) => {
+    try {
+      const userId = req.loggedInUser._id;
+      const { oldPassword, newPassword } = req.body;
+      const user = await userSvc.getSingleRowByFilter({ _id: userId });
+      if (!user) {
+        throw {
+          code: 404,
+          message: "User not found",
+          status: "USER_NOT_FOUND",
+        };
+      }
+      const isPasswordValid = bcrypt.compareSync(oldPassword, user.password);
+      if (!isPasswordValid) {
+        throw {
+          code: 422,
+          message: "Old password is incorrect",
+          status: "OLD_PASSWORD_INCORRECT",
+        };
+      }
+      user.password = bcrypt.hashSync(newPassword, 10);
+      await user.save();
+      res.json({
+        data: {},
+        message: "Password changed successfully.",
+        status: "CHANGE_PASSWORD_SUCCESS",
+        option: null,
+      });
+    } catch (exception) {
+      next(exception);
+    }
+  };
+
+
   logout = async (req, res, next) => {
     try {
       const loggedInUser = req.loggedInUser;
