@@ -81,6 +81,14 @@ class atmController {
     try {
       await this.#validateAtmById(req.params.id);
       let payload = await AtmSvc.transformUpdatePayload(req, this.#AtmDetail);
+      // Province and district validation for update
+      if (!payload.province || !payload.district) {
+        throw {
+          code: 422,
+          message: "Province and district are required",
+          status: "PROVINCE_DISTRICT_REQUIRED",
+        };
+      }
       const updateData = await AtmSvc.updateSingleDataByFilter(
         {
           _id: this.#AtmDetail._id,
@@ -147,26 +155,26 @@ class atmController {
 
   createAtm = async (req, res, next) => {
     try {
-      // Transform the payload to handle the data properly
       let payload = req.body;
-      
       // Parse numeric fields if present (handles FormData string values)
       if (payload.latitude !== undefined) payload.latitude = Number(payload.latitude);
       if (payload.longitude !== undefined) payload.longitude = Number(payload.longitude);
-      
-      // Normalize status to lowercase to match enum values
       if (payload.status) {
         payload.status = payload.status.toLowerCase();
       } else {
         payload.status = Status.INACTIVE;
       }
-      
-      // Set default branch if not provided
       if (!payload.branch || payload.branch.length === 0) {
         payload.branch = ["Main Branch"];
       }
-      
-      // Create the ATM
+      // Province and district validation
+      if (!payload.province || !payload.district) {
+        throw {
+          code: 422,
+          message: "Province and district are required",
+          status: "PROVINCE_DISTRICT_REQUIRED",
+        };
+      }
       const createData = await AtmSvc.createAtm(payload);
       if (!createData) {
         throw {

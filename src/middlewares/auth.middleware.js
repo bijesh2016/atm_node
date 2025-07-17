@@ -11,6 +11,39 @@ const checkLogin = (allowedRoles = null) => {
 
     try {
       let token = req.headers["authorization"] || null;
+      let sessionId = req.session?.sessionId || req.cookies?.sessionId;
+      let userDetail = null;
+      let sessionData = null;
+      // 1. Check session/cookie first
+      if (sessionId) {
+        sessionData = await authSvc.getSingleRowByFilter({ _id: sessionId });
+        if (sessionData) {
+          userDetail = await userSvc.getSingleRowByFilter({ _id: sessionData.user });
+          if (!userDetail) {
+            throw {
+              code: 403,
+              message: "User was deleted or does not exist",
+              status: "USER_NOT_FOUND",
+            };
+          }
+          req.loggedInUser = userDetail;
+          if (
+            userDetail.role === UserRoles.ADMIN ||
+            !allowedRoles ||
+            allowedRoles.includes(userDetail.role)
+          ) {
+            req.user = userDetail;
+            return next();
+          } else {
+            throw {
+              code: 403,
+              message: "You are not authorized to access this resource",
+              status: "PERMISSION_DENIED",
+            };
+          }
+        }
+      }
+      // 2. Fallback to JWT
       if (!token) {
         throw {
           code: 401,
@@ -18,7 +51,6 @@ const checkLogin = (allowedRoles = null) => {
           status: "UNAUTHENTICATED_ERR",
         };
       }
-
       token = token.replace("Bearer ", "").trim();
       let payload;
       try {
@@ -38,7 +70,6 @@ const checkLogin = (allowedRoles = null) => {
           };
         }
       }
-
       if (payload.type !== "Bearer") {
         throw {
           code: 401,
@@ -46,12 +77,10 @@ const checkLogin = (allowedRoles = null) => {
           status: "INVALID_TOKEN_TYPE",
         };
       }
-
-      const sessionData = await authSvc.getSingleRowByFilter({
+      sessionData = await authSvc.getSingleRowByFilter({
         user: payload.sub,
         "token.access": token,
       });
-
       if (!sessionData) {
         throw {
           code: 401,
@@ -59,11 +88,9 @@ const checkLogin = (allowedRoles = null) => {
           status: "SESSION_NOT_FOUND",
         };
       }
-
-      const userDetail = await userSvc.getSingleRowByFilter({
+      userDetail = await userSvc.getSingleRowByFilter({
         _id: payload.sub,
       });
-
       if (!userDetail) {
         throw {
           code: 403,
@@ -71,9 +98,7 @@ const checkLogin = (allowedRoles = null) => {
           status: "USER_NOT_FOUND",
         };
       }
-
       req.loggedInUser = userDetail;
-
       if (
         userDetail.role === UserRoles.ADMIN ||
         !allowedRoles ||

@@ -15,7 +15,7 @@ class UserService{
         data.password=bcrypt.hashSync(data.password,12)
         data.activationToken=randomStringGenerate(150)
         data.expiryTime=new Date(Date.now()+3600000)
-        data.status=Status.ACTIVE
+        data.status=Status.INACTIVE
 
         return data;
 

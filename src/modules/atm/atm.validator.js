@@ -5,6 +5,7 @@ const longitudePattern=/^[-+]?((1[0-7]\d|[1-9]?\d)(\.\d+)?|180(\.0+)?)$/;
 
 const AddAtmDTD=Joi.object({
     name:Joi.string().min(2).max(250).required(),
+    slug:Joi.string().optional(),
     address:Joi.string().min(3).max(150).required(),
     phone:Joi.string().allow(null,'').pattern(phonePattern).optional(),
     bank:Joi.string().required(),
@@ -15,6 +16,8 @@ const AddAtmDTD=Joi.object({
         Joi.string(),
         Joi.array().items(Joi.string())
     ).required(),
+    province: Joi.string().required(),
+    district: Joi.string().required(),
 })
 
 module.exports = { AddAtmDTD };

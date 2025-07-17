@@ -29,6 +29,14 @@ const AtmSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  province: {
+    type: String,
+    required: true,
+  },
+  district: {
+    type: String,
+    required: true,
+  },
   phone: String,
   status: {
     type: String,

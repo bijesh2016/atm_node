@@ -3,7 +3,7 @@ const atmRouter = express.Router();
 const atmCtrl = require("./atm.controller");
 const uploader=require("../../middlewares/file-upload.middleware")
 const bodyValidator = require('../../middlewares/validator.middleware');
-const {AddATMDTD}=require("../atm/atm.validator")
+const {AddAtmDTD}=require("../atm/atm.validator")
 const Atm = require('./atm.model');
 /**
  * @swagger
@@ -124,7 +124,7 @@ atmRouter.get('/:id', atmCtrl.atmDetailById);
  *             schema:
  *               $ref: '#/components/schemas/ATM'
  */
-atmRouter.put('/:id', atmCtrl.atmUpdateById);
+atmRouter.put('/:id', uploader('image').single('image'), bodyValidator(AddAtmDTD), atmCtrl.atmUpdateById);
 
 /**
  * @swagger
@@ -169,7 +169,7 @@ atmRouter.delete('/:id', atmCtrl.atmDeleteById);
  *             schema:
  *               $ref: '#/components/schemas/ATM'
  */
-atmRouter.post('/', bodyValidator(AddATMDTD), atmCtrl.createAtm);
+atmRouter.post('/', uploader('image').single('image'), bodyValidator(AddAtmDTD), atmCtrl.createAtm);
 
 // GET /count - returns the total number of ATMs
 atmRouter.get('/count', async (req, res) => {

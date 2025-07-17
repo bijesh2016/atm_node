@@ -116,6 +116,28 @@ const options = {
             status: { type: 'string' },
           },
         },
+        Review: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            name: { type: 'string' },
+            email: { type: 'string', format: 'email' },
+            message: { type: 'string' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        Notification: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            title: { type: 'string' },
+            message: { type: 'string' },
+            read: { type: 'boolean' },
+            user: { type: 'string' },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
       },
     },
     servers: [

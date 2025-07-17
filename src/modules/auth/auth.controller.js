@@ -115,7 +115,6 @@ class AuthController {
         };
       }                 
 
-
       if(userInfo.status!== Status.ACTIVE||userInfo.activationToken!==null){
         throw{  
           code:422,
@@ -123,28 +122,6 @@ class AuthController {
           status:"NOT_ACTIVATED"
         }
       }               
-      //if account is not activated or activation token is not null 
-      // if (   
-      //   userInfo.status !== Status.ACTIVE ||
-      //   userInfo.activationToken != null
-      // ) {
-      //   throw {
-      //     code: 422,
-      //     message: "Account not activated yet",
-      //     status: "ACCOUNT_NOT_ACTIVATED_YET",
-      //   };   
-      // }
-
-      // // Verify password
-      // const isPasswordValid = bcrypt.compareSync(password, userInfo.password);
-      // if (!isPasswordValid) {
-      //   throw {
-      //     code: 422,
-      //     message: "Credentials do not match",
-      //     status: "CREDENTIALS_DONOT_MATCH",
-      //   };
-      // }
-
       //jwt token 
       const accessToken = jwt.sign(
         {
@@ -172,7 +149,21 @@ class AuthController {
         accessDevice: "web",
         ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
       };
-      await authSvc.storeSession(sessionData);
+      const sessionRecord = await authSvc.storeSession(sessionData);
+
+      // Set session (server-side)
+      req.session.userId = userInfo._id;
+      req.session.accessToken = accessToken;
+      req.session.refreshToken = refreshToken;
+      req.session.sessionId = sessionRecord._id;
+
+
+      // Set cookie (client-side)
+      res.cookie('sessionId', sessionRecord._id.toString(), {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        sameSite: 'lax',
+      });
       res.json({
         data: {
           accessToken: accessToken,
@@ -198,12 +189,13 @@ class AuthController {
           status: "USER_NOT_FOUND",
         };
       }
+
       // Generate reset token and expiry
       const resetToken = randomStringGenerate(48);
       user.resetPasswordToken = resetToken;
       user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+      
       await user.save();
-      // Removed direct email sending from controller
       res.json({
         data: {},
         message: "Password reset link generated.",
