@@ -3,7 +3,7 @@ const checkLogin = require("../../middlewares/auth.middleware")
 const bodyValidator = require("../../middlewares/validator.middleware")
 const authCtrl=require("./auth.controller")
 const {registerUserDTD,LoginDTD,ForgotPasswordDTD,ChangePasswordDTD}=require("./auth.validator")
-// const uploader=require("../../middlewares/file-upload.middleware")
+const uploader=require("../../middlewares/file-upload.middleware")
 
 /**
  * @swagger
@@ -126,6 +126,6 @@ authRouter.post("/me",checkLogin,authCtrl.getLoggedInUserProfile)
  *       200:
     *         description: Logout successful
  */
-authRouter.patch("/logout",checkLogin,authCtrl.logout)
+authRouter.post("/logout",checkLogin,authCtrl.logout)
 
 module.exports=authRouter

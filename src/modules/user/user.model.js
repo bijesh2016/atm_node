@@ -16,7 +16,6 @@ const UserSchema=new mongoose.Schema({
     password:{
         type:String,
         required:true,
-        unique:true,
     },
     phone:{
         type:String,
@@ -25,7 +24,7 @@ const UserSchema=new mongoose.Schema({
     role:{
         type:String,
         enum:Object.values(UserRoles),
-        default:UserRoles.CUSTOMER
+        default:UserRoles.USER
     },
     gender:{
         type:String,

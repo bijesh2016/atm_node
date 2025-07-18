@@ -13,9 +13,9 @@ class UserService{
         }
         // console.log(password)
         data.password=bcrypt.hashSync(data.password,12)
-        data.activationToken=randomStringGenerate(150)
+        data.activationToken=randomStringGenerate(15)
         data.expiryTime=new Date(Date.now()+3600000)
-        data.status=Status.INACTIVE
+        data.status=Status.ACTIVE
 
         return data;
 

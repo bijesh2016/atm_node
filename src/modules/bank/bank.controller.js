@@ -114,7 +114,6 @@ class bankController {
   bankDeleteById = async (req, res, next) => {
     try {
       await this.#validateBankById(req.params.id);
-      // Soft delete: set status to inactive
       const update = await BankSvc.updateSingleDataByFilter(
         { _id: this.#BankDetail._id },
         { status: Status.INACTIVE }

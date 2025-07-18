@@ -16,7 +16,7 @@ const bodyValidator = (rules) => {
     } catch (exception) {
       let error = {
         code: 400,
-        msg: "Validation Failed",
+        error: "Validation Failed", // changed from 'msg' to 'error' for clarity
         status: "VALIDATION_FAILED",
         details: {}
       };
@@ -26,6 +26,9 @@ const bodyValidator = (rules) => {
           let field = errorObj.path.join(".");
           error.details[field] = errorObj.message;
         });
+      } else if (exception.message) {
+        // fallback: if no details, provide the main message
+        error.details.general = exception.message;
       }
 
       console.error("Validation Error:", error);

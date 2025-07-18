@@ -61,7 +61,7 @@ class AuthController {
       let todayTime = Date.now();
 
       if (todayTime > expiryTime) {
-        userDetail.activationToken = randomStringGenerate(150);
+        userDetail.activationToken = randomStringGenerate(15);
         userDetail.expiryTime = new Date(Date.now() + 60 * 60 * 3 * 1000);
         await userDetail.save();
         await authMailSvc.notifyUserRegistration(userDetail);
@@ -151,14 +151,12 @@ class AuthController {
       };
       const sessionRecord = await authSvc.storeSession(sessionData);
 
-      // Set session (server-side)
       req.session.userId = userInfo._id;
       req.session.accessToken = accessToken;
       req.session.refreshToken = refreshToken;
       req.session.sessionId = sessionRecord._id;
 
 
-      // Set cookie (client-side)
       res.cookie('sessionId', sessionRecord._id.toString(), {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 1 day
@@ -191,11 +189,13 @@ class AuthController {
       }
 
       // Generate reset token and expiry
-      const resetToken = randomStringGenerate(48);
+      const resetToken = randomStringGenerate(15);
       user.resetPasswordToken = resetToken;
       user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
       
       await user.save();
+      await authMailSvc.notifyPasswordReset(user); 
+
       res.json({
         data: {},
         message: "Password reset link generated.",

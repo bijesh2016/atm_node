@@ -6,7 +6,7 @@ const Status={
 
 const UserRoles={
     ADMIN:'admin',
-    CUSTOMER:'customer'
+    USER:'user'
 }
 
 module.exports = { Status, UserRoles };

@@ -11,7 +11,9 @@ const registerUserDTD = Joi.object({
   confirmPassword: Joi.ref("password"),
   phone: Joi.string().required(),
   gender: Joi.string().valid("male", "female","others").required(),
-  role: Joi.string().valid("admin", "user").required(),
+ role:Joi.string().regex(/^(admin|user)$/).optional().default('customer'),  address:Joi.string().allow(null,"").optional().default(null),
+  dob:Joi.date().less("now"),
+  image:Joi.string().allow(null,"").optional().default(null),
 });
 
 
