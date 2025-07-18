@@ -17,7 +17,6 @@ const checkLogin = (allowedRoles = null) => {
                 };
             }
 
-            // Remove "Bearer " prefix
             token = token.replace("Bearer ", "");
 
             // Check if session exists for this token
@@ -33,7 +32,6 @@ const checkLogin = (allowedRoles = null) => {
                 };
             }
 
-            // Verify token and extract payload
             const payload = jwt.verify(token, AppConfig.jwtSecret);
 
             if (payload.type !== 'Bearer') {
@@ -56,12 +54,10 @@ const checkLogin = (allowedRoles = null) => {
                 };
             }
 
-            // Set loggedInUser for use in controllers
             req.loggedInUser = userDetail;
 
-            // Role-based access control
             if (userDetail.role === UserRoles.ADMIN || !allowedRoles || allowedRoles.includes(userDetail.role)) {
-                req.user = userDetail; // Optional: pass user info forward
+                req.user = userDetail; 
                 next();
             } else {
                 throw {

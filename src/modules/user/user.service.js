@@ -11,7 +11,6 @@ class UserService{
         if(req.file){
         data.file=await fileUploadSvc.uploadFile(req.file.path,"/users");
         }
-        // console.log(password)
         data.password=bcrypt.hashSync(data.password,12)
         data.activationToken=randomStringGenerate(15)
         data.expiryTime=new Date(Date.now()+3600000)

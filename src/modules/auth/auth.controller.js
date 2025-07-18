@@ -209,6 +209,7 @@ class AuthController {
 
   changePassword = async (req, res, next) => {
     try {
+      console.log("")
       const userId = req.loggedInUser._id;
       const { oldPassword, newPassword } = req.body;
       const user = await userSvc.getSingleRowByFilter({ _id: userId });
