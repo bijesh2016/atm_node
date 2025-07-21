@@ -63,6 +63,20 @@ bankRouter.get('/',bankCtrl.listAllBank);
  */
 bankRouter.get('/:id',bankCtrl.bankDetailById);
 
+// /**
+//  * @swagger
+//  * /bank/popular:
+//  *   get:
+//  *     summary: Get popular banks by views
+//  *     tags: [Bank]
+//  *     security:
+//  *       - bearerAuth: []
+//  *     responses:
+//  *       200:
+//  *         description: Popular banks
+//  */
+// bankRouter.get('/popular', bankCtrl.popularBanks);
+
 /**
  * @swagger
  * /bank/{id}:

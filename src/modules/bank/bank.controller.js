@@ -66,8 +66,10 @@ class bankController {
   bankDetailById = async (req, res, next) => {
     try {
       await this.#validateBankById(req.params.id);
+      await BankSvc.updateSingleDataByFilter({ _id: req.params.id }, { $inc: { views: 1 } });
+      const updatedBank = await BankSvc.getSingleRowByFilter({ _id: req.params.id });
       res.json({
-        data: this.#BankDetail,
+        data: updatedBank,
         message: "Bank detail",
         status: "SUCCESS",
         options: null,
@@ -207,6 +209,21 @@ class bankController {
       next(exception);
     }
   };
+
+//   popularBanks = async (req, res, next) => {
+//     try {
+//       const limit = parseInt(req.query.limit) || 5;
+//       const banks = await BankSvc.getPopularBanks(limit);
+//       res.json({
+//         data: banks,
+//         message: "Popular Banks",
+//         status: "SUCCESS",
+//         options: null,
+//       });
+//     } catch (exception) {
+//       next(exception);
+//     }
+//   };
 
 }
 

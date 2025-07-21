@@ -7,6 +7,7 @@ const userRouter = require("../modules/user/user.router");
 const provinceRouter = require("../modules/province/province.router");
 const districtRouter = require("../modules/district/district.router");
 const localLevelRouter = require("../modules/local_level/local_level.router");
+const reviewRouter = require("../modules/review/review.router");
 // const { authenticationRouter } = require("../modules/auth/authentication");
 
 router.get("/", (req, res, next) => {
@@ -26,6 +27,7 @@ router.use('/user', userRouter);
 router.use('/province', provinceRouter);
 router.use('/district', districtRouter);
 router.use('/local_level', localLevelRouter);
+router.use('/reviews', reviewRouter);
 // router.use('/demo-auth', authenticationRouter);
 
 module.exports = router;

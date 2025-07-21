@@ -118,6 +118,16 @@ class BankService {
       throw exception
     }
   }
+
+  getPopularBanks = async (limit = 5) => {
+    try {
+      return await BankModel.find({ status: { $ne: 'inactive' } })
+        .sort({ views: -1 })
+        .limit(limit);
+    } catch (exception) {
+      throw exception;
+    }
+  };
 }
 
 

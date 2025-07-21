@@ -35,6 +35,16 @@ const BranchSchema = new mongoose.Schema({
     required: true,
   },
   phone: String,
+  manager: {
+    type: String,
+    required: false,
+    default: null,
+  },
+  email: {
+    type: String,
+    required: false,
+    default: null,
+  },
   status: {
     type: String,
     enum: Object.values(Status),

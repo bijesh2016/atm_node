@@ -11,9 +11,15 @@ const uploader=require("../../middlewares/file-upload.middleware");
 class AuthController {
   registerUser = async (req, res, next) => {
     try {
+      const { password, confirmPassword } = req.body;
+      if (password !== confirmPassword) {
+        return res.status(400).json({
+          message: "Password and confirm password do not match.",
+          status: "PASSWORD_MISMATCH"
+        });
+      }
       const data = await userSvc.transformUserRegister(req);
       const user = await userSvc.userRegister(data);
-
       await authMailSvc.notifyUserRegistration(user);
       res.json({
         data: user,
@@ -159,7 +165,7 @@ class AuthController {
 
       res.cookie('sessionId', sessionRecord._id.toString(), {
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        maxAge: 24 * 60 * 60 * 1000, 
         sameSite: 'lax',
       });
       res.json({
@@ -246,11 +252,17 @@ class AuthController {
     try {
       const loggedInUser = req.loggedInUser;
       let filter = {};
+      let sessionId = req.cookies?.sessionId;
       if (req.query.logoutFromAll) {
         filter = {
           user: loggedInUser._id,
         };
-      } else {  
+      } else if (sessionId) {
+        filter = {
+          _id: sessionId,
+          user: loggedInUser._id,
+        };
+      } else {
         const token = req.headers["authorization"]?.replace("Bearer ", "");
         filter = {
           user: loggedInUser._id,
@@ -259,6 +271,7 @@ class AuthController {
       }
 
       await authSvc.destroySession(filter);
+      res.clearCookie('sessionId');
       res.json({
         message: "Logged out successfully",
         status: "LOGOUT_SUCCESSFUL",
