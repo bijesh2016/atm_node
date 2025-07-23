@@ -14,6 +14,12 @@ class branchController {
           name: new RegExp(req.query.search, "i"),
         };
       }
+      if (req.query.province) {
+        filter.province = req.query.province;
+      }
+      if (req.query.district) {
+        filter.district = req.query.district;
+      }
       let { data, pagination } = await BranchSvc.getAllList(req.query, filter);
       res.json({
         data: data,
@@ -36,9 +42,14 @@ class branchController {
           name: new RegExp(req.query.search, "i"),
         };
       }
-      // Add filtering by bankId
       if (req.query.bankId) {
         filter.bank = req.query.bankId;
+      }
+      if (req.query.province) {
+        filter.province = req.query.province;
+      }
+      if (req.query.district) {
+        filter.district = req.query.district;
       }
       let { data, pagination } = await BranchSvc.getAllList(req.query, filter);
       res.json({

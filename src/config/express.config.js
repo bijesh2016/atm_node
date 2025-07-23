@@ -11,12 +11,12 @@ const app = express();
 // CORS configuration
 const corsOptions = {
   origin: [
-    'http://localhost:3000', // React development server
-    'http://localhost:5173', // Vite development server
+    'http://localhost:3000',
+    'http://localhost:5173', 
     'http://127.0.0.1:3000',
     'http://127.0.0.1:5173'
   ],
-  credentials: true, // Allow cookies and authentication headers
+  credentials: true, 
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
 };
@@ -27,16 +27,16 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser());
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your_secret_key',
+  secret: process.env.SESSION_SECRET || 'hgfx12354fdfrgsd',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }, // 1 day
+  cookie: { secure: false, httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }, 
 }));
 
 
 app.use("/api/atm_locator/", router);
 app.get('/test',(req,res)=>{
-       console.log('testin')
+       console.log('testing')
        res.json({ message: 'CORS is working!', timestamp: new Date().toISOString() });
 })
 

@@ -44,6 +44,14 @@ const BankSchema = new mongoose.Schema({
     enum: Object.values(Status),
     default: Status.INACTIVE,
   },
+  province: {
+    type: String,
+    required: false,
+  },
+  district: {
+    type: String,
+    required: false,
+  },
   branch: {
   type: String,
   required: true,

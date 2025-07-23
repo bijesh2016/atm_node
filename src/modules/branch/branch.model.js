@@ -50,6 +50,14 @@ const BranchSchema = new mongoose.Schema({
     enum: Object.values(Status),
     default: Status.INACTIVE,
   },
+  province: {
+    type: String,
+    required: false,
+  },
+  district: {
+    type: String,
+    required: false,
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

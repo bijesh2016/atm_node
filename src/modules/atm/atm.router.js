@@ -72,6 +72,27 @@ atmRouter.get('/',uploader('image').single('image'),atmCtrl.listAllAtm);
 
 /**
  * @swagger
+ * /atm/count:
+ *   get:
+ *     summary: Get total number of ATMs
+ *     tags: [ATMs]
+ *     responses:
+ *       200:
+ *         description: Total number of ATMs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   description: Total number of ATMs
+ */
+
+atmRouter.get('/nearby', atmCtrl.getNearbyATMs);
+
+/**
+ * @swagger
  * /bank/{id}:
  *   get:
  *     summary: Get ATM detail by id
@@ -180,24 +201,5 @@ atmRouter.get('/count', async (req, res) => {
     res.status(500).json({ error: 'Failed to get ATM count' });
   }
 });
-
-/**
- * @swagger
- * /atm/count:
- *   get:
- *     summary: Get total number of ATMs
- *     tags: [ATMs]
- *     responses:
- *       200:
- *         description: Total number of ATMs
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 count:
- *                   type: integer
- *                   description: Total number of ATMs
- */
 
 module.exports = atmRouter;

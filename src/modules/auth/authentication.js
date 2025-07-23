@@ -66,6 +66,13 @@ function protectedController(req, res) {
   return res.json({ message: 'You are authenticated', user: req.user });
 }
 
+function isAdmin(req, res, next) {
+  if (req.user && req.user.role === 'ADMIN') {
+    return next();
+  }
+  return res.status(403).json({ message: 'Forbidden: Admins only' });
+}
+
 // Router setup
 router.post('/login', loginController);
 router.get('/protected', sessionCookieAuth, protectedController);
@@ -74,4 +81,5 @@ router.get('/protected', sessionCookieAuth, protectedController);
 module.exports = {
   authenticationRouter: router,
   sessionCookieAuth,
+  isAdmin,
 }; 

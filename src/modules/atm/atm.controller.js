@@ -195,6 +195,23 @@ class atmController {
     }
   };
 
+  /**
+   * Get nearby ATMs by driving distance
+   * GET /atm/nearby?lat=...&lng=...&limit=10
+   */
+  getNearbyATMs = async (req, res, next) => {
+    try {
+      const { lat, lng, limit } = req.query;
+      if (!lat || !lng) {
+        return res.status(400).json({ error: 'lat and lng required' });
+      }
+      const userCoords = { lat: parseFloat(lat), lng: parseFloat(lng) };
+      const atms = await AtmSvc.getNearbyATMs(userCoords, limit ? parseInt(limit) : 10);
+      res.json({ data: atms, message: 'Nearby ATMs by driving distance', status: 'SUCCESS' });
+    } catch (exception) {
+      next(exception);
+    }
+  }
 }
 
 const atmCtrl = new atmController();

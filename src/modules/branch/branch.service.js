@@ -27,7 +27,12 @@ class BranchService {
       } else {
         data.image = oldData?.image || null;
       }
-
+      if (req.body.province !== undefined) {
+        data.province = req.body.province;
+      }
+      if (req.body.district !== undefined) {
+        data.district = req.body.district;
+      }
       // data.updatedBy = req.loggedInUser._id;
       return data;
     } catch (exception) {

@@ -22,17 +22,19 @@ class BankService {
 
   transformUpdatePayload = async (req, oldData) => {
     try {
-      if (!oldData) {
-        throw new Error('No existing bank data found for update.');
-      }
       let data = req.body;
-
       if (req.file) {
         data.image = '/public/' + req.file.filename;
       } else {
-        data.image = oldData.image;
+        data.image = oldData?.image || null;
       }
-
+      // Ensure province and district are included if present
+      if (req.body.province !== undefined) {
+        data.province = req.body.province;
+      }
+      if (req.body.district !== undefined) {
+        data.district = req.body.district;
+      }
       // data.updatedBy = req.loggedInUser._id;
       return data;
     } catch (exception) {

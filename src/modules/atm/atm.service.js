@@ -1,6 +1,7 @@
 const fileUploadSvc = require("../../services/fileupload.service");
 const slugify = require("slugify");
 const AtmModel = require("./atm.model");
+const { getDrivingDistance } = require('../../utilities/distance');
 
 class AtmService {
   transformCreatePayload = async (req) => {
@@ -100,6 +101,35 @@ class AtmService {
       return data;
     } catch(exception) {
       throw exception
+    }
+  }
+
+  /**
+   * Find nearby ATMs using OpenRouteService for all travel modes
+   * @param {Object} userCoords - { lat, lng }
+   * @param {number} [limit=10] - max number of ATMs to return
+   * @returns {Promise<Array>} - sorted list of ATMs with distances for all modes
+   */
+  getNearbyATMs = async (userCoords, limit = 10) => {
+    try {
+      const { getDistanceForAllModes } = require('../../utilities/distance');
+      // Fetch all ATMs (optionally, filter by rough Haversine for performance)
+      const atms = await AtmModel.find({ status: 'active' });
+      // For each ATM, get distances for all modes
+      const atmDistances = await Promise.all(atms.map(async (atm) => {
+        const atmCoords = { lat: atm.latitude, lng: atm.longitude };
+        const distances = await getDistanceForAllModes(userCoords, atmCoords);
+        // Use driving-car distance for sorting, fallback to walking if not available
+        const sortDistance = distances['driving-car']?.distance ?? distances['foot-walking']?.distance ?? Infinity;
+        return { ...atm.toObject(), distances, sortDistance };
+      }));
+
+      
+      // Sort by driving distance (or walking/cycling if not available)
+      atmDistances.sort((a, b) => a.sortDistance - b.sortDistance);
+      return atmDistances.slice(0, limit);
+    } catch (exception) {
+      throw exception;
     }
   }
 }
