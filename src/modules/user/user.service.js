@@ -58,6 +58,27 @@ class UserService{
     }
 
 
+ transformUserRegister = async (req) => {
+  const { name, email, password, phone, gender, address, role, status,image } = req.body;
+  const data = {
+    name,
+    email,
+    password: bcrypt.hashSync(password, 10),
+    phone,
+    gender,
+    address,
+    role: role || 'user', 
+    status: status || 'inactive', 
+    image,
+    activationToken: randomStringGenerate(15),
+    expiryTime: new Date(Date.now() + 3 * 60 * 60 * 1000), 
+  };
+  if (req.file) {
+    data.image = req.file.path; 
+  }
+  return data;
+};
+
 }
 const userSvc=new UserService()
 module.exports=userSvc

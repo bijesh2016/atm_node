@@ -8,13 +8,14 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const app = express();
 
-// CORS configuration
 const corsOptions = {
   origin: [
     'http://localhost:3000',
     'http://localhost:5173', 
     'http://127.0.0.1:3000',
-    'http://127.0.0.1:5173'
+    // 'http://127.0.0.1:5173',
+    // 'https://89c9aaa60cc5.ngrok-free.app', 
+    // 'https://c9eb8ef149dc.ngrok-free.app'
   ],
   credentials: true, 
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -35,10 +36,6 @@ app.use(session({
 
 
 app.use("/api/atm_locator/", router);
-app.get('/test',(req,res)=>{
-       console.log('testing')
-       res.json({ message: 'CORS is working!', timestamp: new Date().toISOString() });
-})
 
 app.use("/assets", express.static("./public/uploads"));
 

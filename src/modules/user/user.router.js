@@ -32,15 +32,13 @@ router.get('/count', async (req, res) => {
   }
 });
 
-// Profile image upload route
 router.post('/upload-profile-image/:userId', uploader('image').single('image'), async (req, res) => {
   try {
     const userId = req.params.userId;
     if (!req.file) {
       return res.status(400).json({ error: 'No image file uploaded' });
     }
-    // Optionally, upload to cloud storage here and get URLs
-    // For now, use local file path
+
     const imageUrl = `/public/${req.file.filename}`;
     const user = await User.findByIdAndUpdate(
       userId,
@@ -48,7 +46,7 @@ router.post('/upload-profile-image/:userId', uploader('image').single('image'), 
         image: {
           publicId: req.file.filename,
           url: imageUrl,
-          thumbUrl: imageUrl // For demo, use same as url
+          thumbUrl: imageUrl 
         }
       },
       { new: true }

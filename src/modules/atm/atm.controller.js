@@ -137,8 +137,6 @@ class atmController {
           status: "NOT_FOUND",
         };
       }
-
-      // For now, return empty branches array since we don't have branch-ATM relationship
       res.json({
         data: {
           detail: this.#AtmDetail,
@@ -167,7 +165,6 @@ class atmController {
       if (!payload.branch || payload.branch.length === 0) {
         payload.branch = ["Main Branch"];
       }
-      // Province and district validation
       if (!payload.province || !payload.district) {
         throw {
           code: 422,
