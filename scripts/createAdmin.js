@@ -1,100 +1,67 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-require('dotenv').config({ path: '.env' });
+const User = require('../src/modules/user/user.model');
+const { Status, UserRoles } = require('../src/config/constant');
 
-mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/atm_locator', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  phone: { type: String, required: true },
-  gender: { type: String, required: true, enum: ['male', 'female', 'others'] },
-  address: { type: String, default: '' },
-  dob: { type: Date },
-  role: { type: String, default: 'user', enum: ['user', 'admin'] },
-  status: { type: String, default: 'active' },
-  activationToken: String,
-  expiryTime: Date
-}, { timestamps: true });
-
-const User = mongoose.model('User', userSchema);
-
-const adminUser = {
-  name: 'Admin User',
-  email: 'superadmin@gmail.com',
-  password: 'Admin@123', 
-  phone: '1234567890',
-  gender: 'male',
-  address: 'Admin Address',
-  role: 'admin',
-  status: 'active',
-  activationToken: null,
-  expiryTime: null
+// MongoDB connection
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/atm_locator');
+    console.log('MongoDB connected successfully');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
+  }
 };
 
-async function createAdmin() {
+// Create admin user
+const createAdminUser = async () => {
   try {
-    console.log('Connecting to MongoDB...');
-    
-    await new Promise((resolve, reject) => {
-      mongoose.connection.on('connected', resolve);
-      mongoose.connection.on('error', reject);
-    });
-    
-    console.log('Successfully connected to MongoDB');
-
-    console.log('Checking for existing admin user...');
-    const existingAdmin = await User.findOne({ email: adminUser.email });
+    // Check if admin already exists
+    const existingAdmin = await User.findOne({ email: 'superadmin@gmail.com' });
     
     if (existingAdmin) {
-      console.log('\nAdmin user already exists:');
-      console.log(`Email: ${existingAdmin.email}`);
-      console.log('Role:', existingAdmin.role);
-      console.log('Status:', existingAdmin.status);
-      console.log('\nTo reset the admin password, you need to:');
-      console.log('1. Delete the existing admin user from the database, or');
-      console.log('2. Update the password directly in the database');
-      process.exit(0);
+      console.log('Admin user already exists!');
+      console.log('Email: superadmin@gmail.com');
+      console.log('Password: Admin@123');
+      return;
     }
 
-    console.log('No existing admin found. Creating new admin user...');
-    
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(adminUser.password, salt);
-    
-    const user = new User({
-      ...adminUser,
-      password: hashedPassword
-    });
-    
-    await user.save();
+    // Hash password
+    const hashedPassword = bcrypt.hashSync('Admin@123', 10);
 
-    console.log('\n✅ Admin user created successfully!');
-    console.log('================================');
-    console.log('Email:    ', adminUser.email);
-    console.log('Password: ', adminUser.password);
-    console.log('Role:     ', 'admin');
-    console.log('Status:   ', 'active');
-    console.log('================================');
-    console.log('\n⚠️  IMPORTANT: Change this password after first login!');
+    // Create admin user
+    const adminUser = new User({
+      name: 'Super Admin',
+      email: 'superadmin@gmail.com',
+      password: hashedPassword,
+      phone: '1234567890',
+      role: UserRoles.ADMIN,
+      gender: 'male',
+      address: 'Admin Address',
+      status: Status.ACTIVE,
+      activationToken: null, // No activation required for admin
+    });
+
+    await adminUser.save();
+    
+    console.log('✅ Admin user created successfully!');
+    console.log('📧 Email: superadmin@gmail.com');
+    console.log('🔑 Password: Admin@123');
+    console.log('👤 Role: Admin');
+    console.log('✅ Status: Active');
     
   } catch (error) {
-    console.error('\n❌ Error creating admin user:');
-    console.error(error.message);
-    
-    if (error.code === 'ECONNREFUSED') {
-      console.error('\nCould not connect to MongoDB. Make sure your MongoDB server is running.');
-      console.error('If using a custom connection string, set it in the .env file as MONGO_URI');
-    }
-    
-    process.exit(1);
-  } finally {
-    mongoose.connection.close();
+    console.error('❌ Error creating admin user:', error);
   }
-}
+};
 
-createAdmin();
+// Run the script
+const run = async () => {
+  await connectDB();
+  await createAdminUser();
+  mongoose.connection.close();
+  console.log('Script completed!');
+};
+
+run();

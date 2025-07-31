@@ -5,6 +5,7 @@ const uploader=require("../../middlewares/file-upload.middleware")
 const bodyValidator = require('../../middlewares/validator.middleware');
 const {AddAtmDTD}=require("../atm/atm.validator")
 const Atm = require('./atm.model');
+const { verifyAdmin } = require('../../middlewares/auth.middleware');
 /**
  * @swagger
  * /atm/for-home:
@@ -145,7 +146,7 @@ atmRouter.get('/:id', atmCtrl.atmDetailById);
  *             schema:
  *               $ref: '#/components/schemas/ATM'
  */
-atmRouter.put('/:id', uploader('image').single('image'), bodyValidator(AddAtmDTD), atmCtrl.atmUpdateById);
+atmRouter.put('/:id', verifyAdmin, uploader('image').single('image'), bodyValidator(AddAtmDTD), atmCtrl.atmUpdateById);
 
 /**
  * @swagger
@@ -166,7 +167,7 @@ atmRouter.put('/:id', uploader('image').single('image'), bodyValidator(AddAtmDTD
  *       200:
  *         description: ATM deleted
  */
-atmRouter.delete('/:id', atmCtrl.atmDeleteById);
+atmRouter.delete('/:id', verifyAdmin, atmCtrl.atmDeleteById);
 
 /**
  * @swagger
@@ -190,7 +191,7 @@ atmRouter.delete('/:id', atmCtrl.atmDeleteById);
  *             schema:
  *               $ref: '#/components/schemas/ATM'
  */
-atmRouter.post('/', uploader('image').single('image'), bodyValidator(AddAtmDTD), atmCtrl.createAtm);
+atmRouter.post('/', verifyAdmin, uploader('image').single('image'), bodyValidator(AddAtmDTD), atmCtrl.createAtm);
 
 // GET /count - returns the total number of ATMs
 atmRouter.get('/count', async (req, res) => {

@@ -49,7 +49,9 @@ const UserSchema=new mongoose.Schema({
         default:Status.INACTIVE
     },
     activationToken:String,
-    expiryTime:Date
+    expiryTime:Date,
+    resetPasswordToken:String,
+    resetPasswordExpires:Date
 },{
     timestamps:true,
     autoCreate:true,

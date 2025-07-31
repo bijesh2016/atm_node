@@ -5,6 +5,7 @@ const uploader = require('../../middlewares/file-upload.middleware');
 const bodyValidator = require('../../middlewares/validator.middleware');
 const {AddBankDTD}=require("../../modules/bank/bank.validator")
 const Bank = require('./bank.model');
+const { verifyAdmin } = require('../../middlewares/auth.middleware');
 
 /**
  * @swagger
@@ -18,6 +19,7 @@ const Bank = require('./bank.model');
  *       200:
  *         description: List of banks
  */
+// Public routes (no authentication required)
 bankRouter.get("/for-home",bankCtrl.banksForHome);
 
 /**
@@ -106,7 +108,8 @@ bankRouter.get('/:id',bankCtrl.bankDetailById);
  *             schema:
  *               $ref: '#/components/schemas/Bank'
  */
-bankRouter.post('/:id',uploader('single').single('image'),bodyValidator(AddBankDTD),bankCtrl.bankUpdateById);
+// Admin routes (require admin authentication)
+bankRouter.post('/:id', verifyAdmin, uploader('single').single('image'),bodyValidator(AddBankDTD),bankCtrl.bankUpdateById);
 
 /**
  * @swagger
@@ -127,7 +130,7 @@ bankRouter.post('/:id',uploader('single').single('image'),bodyValidator(AddBankD
  *       200:
  *         description: Bank deleted
  */
-bankRouter.delete('/:id',bankCtrl.bankDeleteById);
+bankRouter.delete('/:id', verifyAdmin, bankCtrl.bankDeleteById);
 
 /**
  * @swagger
@@ -165,7 +168,7 @@ bankRouter.get('/branches/:slug',bankCtrl.branchesByBankSlug);
  *             schema:
  *               $ref: '#/components/schemas/Bank'
  */
-bankRouter.post('/',bankCtrl.createBank);
+bankRouter.post('/', verifyAdmin, bankCtrl.createBank);
 
 /**
  * @swagger

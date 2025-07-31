@@ -277,9 +277,11 @@ const uploader = require("../../middlewares/file-upload.middleware");
 authRouter.post("/register", uploader("image").single("image"), bodyValidator(registerUserDTD), authCtrl.register);
 authRouter.get("/activate/:token", authCtrl.activateUserProfile);
 authRouter.post("/login", bodyValidator(LoginDTD), authCtrl.login);
+authRouter.post("/admin/login", bodyValidator(LoginDTD), authCtrl.adminLogin);
 authRouter.post("/forgot-password", bodyValidator(ForgotPasswordDTD), authCtrl.forgotPassword);
 authRouter.post("/change-password", verifyToken, bodyValidator(ChangePasswordDTD), authCtrl.changePassword);
 authRouter.post("/me", verifyToken, authCtrl.getLoggedInUserProfile);
-authRouter.post("/logout", verifyToken, authCtrl.logout);
+authRouter.post("/reset-password/:token",authCtrl.resetPassword)
+authRouter.post("/logout", authCtrl.logout);
 
 module.exports = authRouter;

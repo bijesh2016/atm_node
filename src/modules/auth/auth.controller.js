@@ -7,6 +7,11 @@ const { randomStringGenerate } = require("../../utilities/helpers");
 const { Status } = require("../../config/constant");
 const uploader = require("../../middlewares/file-upload.middleware");
 
+const ADMIN_CREDENTIALS = {
+  email: "superadmin@gmail.com",
+  password: "Admin@123", 
+};
+
 class AuthController {
   register = async (req, res, next) => {
     try {
@@ -96,46 +101,81 @@ class AuthController {
     }
   };
 
-  activateUserProfile = async (req, res, next) => {
-    try {
-      let token = req.params.token;
-      const userDetail = await userSvc.getSingleRowByFilter({
-        activationToken: token,
-      });
+  // activateUserProfile = async (req, res, next) => {
+  //   try {
+  //     let token = req.params.token;
+  //     const userDetail = await userSvc.getSingleRowByFilter({
+  //       activationToken: token,
+  //     });
 
-      if (!userDetail) {
-        return res.status(422).json({
-          message: "User not found",
-          status: "USER_DOES_NOT_EXISTS",
-        });
-      }
-      let expiryTime = userDetail.expiryTime.getTime();
-      let todayTime = Date.now();
+  //     if (!userDetail) {
+  //       return res.status(422).json({
+  //         message: "User not found",
+  //         status: "USER_DOES_NOT_EXISTS",
+  //       });
+  //     }
+  //     let expiryTime = userDetail.expiryTime.getTime();
+  //     let todayTime = Date.now();
 
-      if (todayTime > expiryTime) {
-        userDetail.activationToken = randomStringGenerate(15);
-        userDetail.expiryTime = new Date(Date.now() + 60 * 60 * 3 * 1000);
-        await userDetail.save();
-        await authMailSvc.notifyUserRegistration(userDetail);
-        res.json({
-          message: "A new verification link has been sent to your registered account",
-          status: "RESENT_VERIFICATION_LINK",
-        });
-      } else {
-        userDetail.activationToken = null;
-        userDetail.expiryTime = null;
-        userDetail.status = Status.ACTIVE;
-        await userDetail.save();
-        await authMailSvc.notifyActivationSuccess(userDetail);
-        res.json({
-          message: "Your account has been activated successfully. Please login to continue...",
-          status: "ACCOUNT_ACTIVATED",
-        });
-      }
-    } catch (exception) {
-      next(exception);
+  //     if (todayTime > expiryTime) {
+  //       userDetail.activationToken = randomStringGenerate(15);
+  //       userDetail.expiryTime = new Date(Date.now() + 60 * 60 * 3 * 1000);
+  //       await userDetail.save();
+  //       await authMailSvc.notifyUserRegistration(userDetail);
+  //       res.json({
+  //         message: "A new verification link has been sent to your registered account",
+  //         status: "RESENT_VERIFICATION_LINK",
+  //       });
+  //     } else {
+  //       userDetail.activationToken = null;
+  //       userDetail.expiryTime = null;
+  //       userDetail.status = Status.ACTIVE;
+  //       await userDetail.save();
+  //       await authMailSvc.notifyActivationSuccess(userDetail);
+  //       res.json({
+  //         message: "Your account has been activated successfully. Please login to continue...",
+  //         status: "ACCOUNT_ACTIVATED",
+  //       });
+  //     }
+  //   } catch (exception) {
+  //     next(exception);
+  //   }
+  // };
+
+activateUserProfile = async (req, res, next) => {
+  try {
+    let token = req.params.token;
+    const userDetail = await userSvc.getSingleRowByFilter({
+      activationToken: token,
+    });
+
+    if (!userDetail) {
+      return res.redirect('http://localhost:5173/auth?error=User not found');
     }
-  };
+    let expiryTime = userDetail.expiryTime.getTime();
+    let todayTime = Date.now();
+
+    if (todayTime > expiryTime) {
+      userDetail.activationToken = randomStringGenerate(15);
+      userDetail.expiryTime = new Date(Date.now() + 60 * 60 * 3 * 1000);
+      await userDetail.save();
+      await authMailSvc.notifyUserRegistration(userDetail);
+      return res.redirect('http://localhost:5173/auth?message=A new verification link has been sent to your email');
+    } else {
+      userDetail.activationToken = null;
+      userDetail.expiryTime = null;
+      userDetail.status = Status.ACTIVE;
+      await userDetail.save();
+      await authMailSvc.notifyActivationSuccess(userDetail);
+      return res.redirect('http://localhost:5173/auth?message=Account activated successfully. Please login.');
+    }
+  } catch (exception) {
+    next(exception);
+  }
+};
+
+
+
 
   forgotPassword = async (req, res, next) => {
     try {
@@ -190,19 +230,125 @@ class AuthController {
     }
   };
 
+
+  resetPassword = async (req, res, next) => {
+  try {
+    const { token } = req.params;
+    const { newPassword } = req.body;
+
+    // Find user by reset token
+    const user = await userSvc.getSingleRowByFilter({ resetPasswordToken: token });
+    if (!user) {
+      return res.status(404).json({ message: 'Invalid or expired reset token', status: 'NOT_FOUND' });
+    }
+
+    // Check if token is expired
+    if (user.resetPasswordExpires && new Date() > user.resetPasswordExpires) {
+      return res.status(400).json({ message: 'Reset token has expired', status: 'TOKEN_EXPIRED' });
+    }
+
+    // Hash new password
+    const hashedPassword = bcrypt.hashSync(newPassword, 10);
+    
+    // Update user password and clear reset token
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    res.status(200).json({ message: 'Password reset successfully', status: 'SUCCESS' });
+  } catch (error) {
+    console.error('Reset Password Error:', error);
+    res.status(500).json({ message: 'Server error', status: 'SERVER_ERROR' });
+  }
+};
+
   logout = async (req, res, next) => {
     try {
+      // Always clear the cookie regardless of token validity
       res.clearCookie('access_token', {
         httpOnly: true,
         secure: AppConfig.env === 'production',
         sameSite: 'strict',
+        path: '/', // Ensure cookie is cleared from all paths
       });
+      
       res.json({
         message: "Logged out successfully",
         status: "LOGOUT_SUCCESSFUL",
       });
     } catch (exception) {
-      next(exception);
+      // Even if there's an error, try to clear the cookie
+      res.clearCookie('access_token', {
+        httpOnly: true,
+        secure: AppConfig.env === 'production',
+        sameSite: 'strict',
+        path: '/',
+      });
+      
+      res.json({
+        message: "Logged out successfully",
+        status: "LOGOUT_SUCCESSFUL",
+      });
+    }
+  };
+
+  adminLogin = async (req, res, next) => {
+    try {
+      const { email, password } = req.body;
+      
+      // Hardcoded admin credentials
+      const ADMIN_CREDENTIALS = {
+        email: "superadmin@gmail.com",
+        password: "Admin@123"
+      };
+      
+      // Check hardcoded credentials
+      if (email !== ADMIN_CREDENTIALS.email || password !== ADMIN_CREDENTIALS.password) {
+        return res.status(401).json({
+          message: "Invalid admin credentials",
+          status: "INVALID_CREDENTIALS",
+        });
+      }
+
+      // Create admin user object for response
+      const adminUser = {
+        _id: "admin_user_id",
+        name: "Admin User",
+        email: ADMIN_CREDENTIALS.email,
+        role: 'admin',
+        status: Status.ACTIVE,
+        image: null,
+        gender: null,
+        address: null,
+        dob: null,
+        phone: null
+      };
+
+      // Generate JWT token
+      const token = jwt.sign(
+        { id: adminUser._id, isAdmin: true, role: 'admin' },
+        AppConfig.jwtSecret,
+        { expiresIn: "1d" }
+      );
+
+      // Set HTTP-only cookie
+      res
+        .cookie("access_token", token, {
+          httpOnly: true,
+          secure: AppConfig.env === 'production',
+          sameSite: 'strict',
+          maxAge: 24 * 60 * 60 * 1000, // 1 day
+        })
+        .status(200)
+        .json({
+          message: "Admin login successful",
+          status: "ADMIN_LOGIN_SUCCESS",
+          details: adminUser,
+          isAdmin: true,
+        });
+    } catch (error) {
+      next(error);
     }
   };
 }
