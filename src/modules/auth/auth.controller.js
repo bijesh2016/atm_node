@@ -145,31 +145,51 @@ class AuthController {
 activateUserProfile = async (req, res, next) => {
   try {
     let token = req.params.token;
+    console.log('Activation attempt for token:', token);
     const userDetail = await userSvc.getSingleRowByFilter({
       activationToken: token,
     });
+    console.log('User found for activation:', userDetail);
 
     if (!userDetail) {
+      console.log('No user found for token');
       return res.redirect('http://localhost:5173/auth?error=User not found');
     }
     let expiryTime = userDetail.expiryTime.getTime();
     let todayTime = Date.now();
+    console.log('Expiry time:', expiryTime, 'Current time:', todayTime);
 
     if (todayTime > expiryTime) {
       userDetail.activationToken = randomStringGenerate(15);
       userDetail.expiryTime = new Date(Date.now() + 60 * 60 * 3 * 1000);
       await userDetail.save();
       await authMailSvc.notifyUserRegistration(userDetail);
+      console.log('Token expired, new token sent');
       return res.redirect('http://localhost:5173/auth?message=A new verification link has been sent to your email');
     } else {
       userDetail.activationToken = null;
       userDetail.expiryTime = null;
       userDetail.status = Status.ACTIVE;
+      console.log('About to save user as active:', userDetail);
       await userDetail.save();
+      console.log('User activated and saved successfully');
       await authMailSvc.notifyActivationSuccess(userDetail);
-      return res.redirect('http://localhost:5173/auth?message=Account activated successfully. Please login.');
+      // Auto-login: generate JWT and set cookie
+      const jwtToken = jwt.sign(
+        { id: userDetail._id, isAdmin: userDetail.role === 'admin' },
+        AppConfig.jwtSecret,
+        { expiresIn: "1d" }
+      );
+      res.cookie("access_token", jwtToken, {
+        httpOnly: true,
+        secure: AppConfig.env === 'production',
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+      return res.redirect('http://localhost:5173/');
     }
   } catch (exception) {
+    console.error('Activation error:', exception);
     next(exception);
   }
 };
@@ -231,32 +251,103 @@ activateUserProfile = async (req, res, next) => {
   };
 
 
-  resetPassword = async (req, res, next) => {
-  try {
-    const { token } = req.params;
-    const { newPassword } = req.body;
+    showResetPasswordForm = async (req, res, next) => {
+    try {
+      const { token } = req.params;
+      
+      const user = await userSvc.getSingleRowByFilter({ resetPasswordToken: token });
+      if (!user) {
+        return res.redirect('http://localhost:5173/auth?error=Invalid or expired reset token');
+      }
 
-    // Find user by reset token
+      if (user.resetPasswordExpires && new Date() > user.resetPasswordExpires) {
+        return res.redirect('http://localhost:5173/auth?error=Reset token has expired');
+      }
+
+      // Show a simple HTML form for password reset
+      const htmlForm = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Reset Password - ATM Locator</title>
+          <style>
+            body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; }
+            .form-group { margin-bottom: 15px; }
+            label { display: block; margin-bottom: 5px; font-weight: bold; }
+            input[type="password"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+            button { background: #0d6efd; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; }
+            button:hover { background: #0b5ed7; }
+            .error { color: red; margin-bottom: 10px; }
+          </style>
+        </head>
+        <body>
+          <h2>Reset Your Password</h2>
+          <form method="POST" action="/api/atm_locator/auth/reset-password/${token}">
+            <div class="form-group">
+              <label for="newPassword">New Password:</label>
+              <input type="password" id="newPassword" name="newPassword" required minlength="6">
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword">Confirm Password:</label>
+              <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
+            </div>
+            <button type="submit">Reset Password</button>
+          </form>
+          <script>
+            document.querySelector('form').addEventListener('submit', function(e) {
+              const password = document.getElementById('newPassword').value;
+              const confirm = document.getElementById('confirmPassword').value;
+              if (password !== confirm) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+              }
+            });
+          </script>
+        </body>
+        </html>
+      `;
+      
+      res.send(htmlForm);
+    } catch (error) {
+      console.error('Show Reset Password Form Error:', error);
+      res.redirect('http://localhost:5173/auth?error=Server error');
+    }
+  };
+
+  resetPassword = async (req, res, next) => {
+    try {
+      const { token } = req.params;
+      const { newPassword } = req.body;
+
     const user = await userSvc.getSingleRowByFilter({ resetPasswordToken: token });
     if (!user) {
       return res.status(404).json({ message: 'Invalid or expired reset token', status: 'NOT_FOUND' });
     }
 
-    // Check if token is expired
     if (user.resetPasswordExpires && new Date() > user.resetPasswordExpires) {
       return res.status(400).json({ message: 'Reset token has expired', status: 'TOKEN_EXPIRED' });
     }
 
-    // Hash new password
     const hashedPassword = bcrypt.hashSync(newPassword, 10);
     
-    // Update user password and clear reset token
     user.password = hashedPassword;
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
     await user.save();
 
-    res.status(200).json({ message: 'Password reset successfully', status: 'SUCCESS' });
+    // Auto-login: generate JWT and set cookie
+    const jwtToken = jwt.sign(
+      { id: user._id, isAdmin: user.role === 'admin' },
+      AppConfig.jwtSecret,
+      { expiresIn: "1d" }
+    );
+    res.cookie("access_token", jwtToken, {
+      httpOnly: true,
+      secure: AppConfig.env === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    return res.redirect('http://localhost:5173/');
   } catch (error) {
     console.error('Reset Password Error:', error);
     res.status(500).json({ message: 'Server error', status: 'SERVER_ERROR' });
@@ -265,12 +356,11 @@ activateUserProfile = async (req, res, next) => {
 
   logout = async (req, res, next) => {
     try {
-      // Always clear the cookie regardless of token validity
       res.clearCookie('access_token', {
         httpOnly: true,
         secure: AppConfig.env === 'production',
         sameSite: 'strict',
-        path: '/', // Ensure cookie is cleared from all paths
+        path: '/', 
       });
       
       res.json({
@@ -278,7 +368,6 @@ activateUserProfile = async (req, res, next) => {
         status: "LOGOUT_SUCCESSFUL",
       });
     } catch (exception) {
-      // Even if there's an error, try to clear the cookie
       res.clearCookie('access_token', {
         httpOnly: true,
         secure: AppConfig.env === 'production',
@@ -297,13 +386,11 @@ activateUserProfile = async (req, res, next) => {
     try {
       const { email, password } = req.body;
       
-      // Hardcoded admin credentials
       const ADMIN_CREDENTIALS = {
         email: "superadmin@gmail.com",
         password: "Admin@123"
       };
       
-      // Check hardcoded credentials
       if (email !== ADMIN_CREDENTIALS.email || password !== ADMIN_CREDENTIALS.password) {
         return res.status(401).json({
           message: "Invalid admin credentials",
@@ -311,7 +398,6 @@ activateUserProfile = async (req, res, next) => {
         });
       }
 
-      // Create admin user object for response
       const adminUser = {
         _id: "admin_user_id",
         name: "Admin User",
@@ -325,20 +411,18 @@ activateUserProfile = async (req, res, next) => {
         phone: null
       };
 
-      // Generate JWT token
       const token = jwt.sign(
         { id: adminUser._id, isAdmin: true, role: 'admin' },
         AppConfig.jwtSecret,
         { expiresIn: "1d" }
       );
 
-      // Set HTTP-only cookie
       res
         .cookie("access_token", token, {
           httpOnly: true,
           secure: AppConfig.env === 'production',
           sameSite: 'strict',
-          maxAge: 24 * 60 * 60 * 1000, // 1 day
+          maxAge: 24 * 60 * 60 * 1000, 
         })
         .status(200)
         .json({

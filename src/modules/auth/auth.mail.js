@@ -8,7 +8,8 @@ class AuthMail {
   }
   notifyUserRegistration = async (user) => {
     try {
-      const activationLink = `${AppConfig.appUrl}/auth/activate/${user.activationToken}`;
+      const backendActivationLink = `http://localhost:9000/api/atm_locator/auth/activate/${user.activationToken}`;
+      const frontendActivationLink = `${AppConfig.appUrl}/auth/activate/${user.activationToken}`;
       const emailTemplate = `
   <div style="font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; padding: 40px;">
     <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
@@ -26,12 +27,15 @@ class AuthMail {
           Thank you for registering with <strong>ATM Locator</strong>. We’re excited to have you on board.
         </p>
         <p style="font-size: 16px; color: #555;">
-          To complete your registration, please verify your email by clicking the button below:
+          To complete your registration, please verify your email by clicking <b>either</b> of the buttons below:
         </p>
         
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${activationLink}" style="background-color: #0d6efd; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-size: 16px;">
-            Activate Account
+          <a href="${backendActivationLink}" style="background-color: #0d6efd; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-size: 16px; margin-right: 10px;">
+            Activate via Backend (Recommended)
+          </a>
+          <a href="${frontendActivationLink}" style="background-color: #198754; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-size: 16px; margin-left: 10px;">
+            Activate via Frontend
           </a>
         </div>
 
@@ -46,7 +50,6 @@ class AuthMail {
         <a href="#" style="color: #0d6efd; text-decoration: none;">Visit our website</a> | 
         <a href="#" style="color: #0d6efd; text-decoration: none;">Contact Support</a>
       </div>
-
     </div>
   </div>
 `;
@@ -59,6 +62,8 @@ class AuthMail {
       throw exception;
     }
   };
+
+
   notifyActivationSuccess = async (user) => {
     try {
       const loginLink = `${AppConfig.appUrl}/auth/login/`;
@@ -111,7 +116,8 @@ class AuthMail {
   };
   notifyPasswordReset = async (user) => {
     try {
-      const resetLink = `${AppConfig.appUrl}/reset-password/${user.resetPasswordToken}`;
+      const backendResetLink = `http://localhost:9000/api/atm_locator/auth/reset-password/${user.resetPasswordToken}`;
+      const frontendResetLink = `${AppConfig.appUrl}/reset-password/${user.resetPasswordToken}`;
       const emailTemplate = `
   <div style="font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; padding: 40px;">
     <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
@@ -122,20 +128,26 @@ class AuthMail {
       </div>
       <!-- Body -->
       <div style="padding: 30px 20px;">
-        <h2 style="color: #333;">Hi ${user.name || user.email},</h2>
+        <h2 style="color: #333;">Hello, ${user.name}!</h2>
         <p style="font-size: 16px; color: #555;">
           We received a request to reset your password for your <strong>ATM Locator</strong> account.
         </p>
         <p style="font-size: 16px; color: #555;">
-          Click the button below to reset your password. This link will expire in <strong>1 hour</strong>.
+          To reset your password, please click <b>either</b> of the buttons below:
         </p>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${resetLink}" style="background-color: #dc3545; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-size: 16px;">
-            Reset Password
+          <a href="${backendResetLink}" style="background-color: #dc3545; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-size: 16px; margin-right: 10px;">
+            Reset via Backend (Recommended)
+          </a>
+          <a href="${frontendResetLink}" style="background-color: #198754; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-size: 16px; margin-left: 10px;">
+            Reset via Frontend
           </a>
         </div>
         <p style="font-size: 14px; color: #999;">
-          If you did not request a password reset, you can safely ignore this email.
+          This link will expire in <strong>1 hour</strong>. If you didn't request this password reset, you can safely ignore this email.
+        </p>
+        <p style="font-size: 14px; color: #999;">
+          For security reasons, please do not share this email with anyone.
         </p>
       </div>
       <!-- Footer -->

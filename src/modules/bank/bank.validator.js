@@ -16,6 +16,8 @@ const AddBankDTD=Joi.object({
     branch:Joi.string().required(),
     website:Joi.string().optional(),
     image:Joi.string().allow(null,"").optional().default(null),
+    province:Joi.string().allow(null,"").optional().default(null),
+    district:Joi.string().allow(null,"").optional().default(null),
 })
 
 module.exports={AddBankDTD}

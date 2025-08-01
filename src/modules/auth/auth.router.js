@@ -281,7 +281,8 @@ authRouter.post("/admin/login", bodyValidator(LoginDTD), authCtrl.adminLogin);
 authRouter.post("/forgot-password", bodyValidator(ForgotPasswordDTD), authCtrl.forgotPassword);
 authRouter.post("/change-password", verifyToken, bodyValidator(ChangePasswordDTD), authCtrl.changePassword);
 authRouter.post("/me", verifyToken, authCtrl.getLoggedInUserProfile);
-authRouter.post("/reset-password/:token",authCtrl.resetPassword)
+authRouter.get("/reset-password/:token", authCtrl.showResetPasswordForm);
+authRouter.post("/reset-password/:token", authCtrl.resetPassword);
 authRouter.post("/logout", authCtrl.logout);
 
 module.exports = authRouter;
