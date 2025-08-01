@@ -42,7 +42,6 @@ const verifyAdmin = async (req, res, next) => {
 
     const decoded = jwt.verify(token, AppConfig.jwtSecret);
     
-    // For hardcoded admin, check if the token was issued for admin
     if (decoded.isAdmin && decoded.role === 'admin') {
       req.user = { id: decoded.id, isAdmin: true };
       req.loggedInUser = {
@@ -54,7 +53,6 @@ const verifyAdmin = async (req, res, next) => {
       return next();
     }
     
-    // For database users, check if user exists and is admin
     const user = await userSvc.getSingleRowByFilter({ _id: decoded.id });
     if (!user) {
       return next(createError(403, "User was deleted or does not exist"));

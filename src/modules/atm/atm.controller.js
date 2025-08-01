@@ -81,7 +81,6 @@ class atmController {
     try {
       await this.#validateAtmById(req.params.id);
       let payload = await AtmSvc.transformUpdatePayload(req, this.#AtmDetail);
-      // Province and district validation for update
       if (!payload.province || !payload.district) {
         throw {
           code: 422,
@@ -154,7 +153,6 @@ class atmController {
   createAtm = async (req, res, next) => {
     try {
       let payload = req.body;
-      // Parse numeric fields if present (handles FormData string values)
       if (payload.latitude !== undefined) payload.latitude = Number(payload.latitude);
       if (payload.longitude !== undefined) payload.longitude = Number(payload.longitude);
       if (payload.status) {
@@ -192,10 +190,6 @@ class atmController {
     }
   };
 
-  /**
-   * Get nearby ATMs by driving distance
-   * GET /atm/nearby?lat=...&lng=...&limit=10
-   */
   getNearbyATMs = async (req, res, next) => {
     try {
       const { lat, lng, limit } = req.query;

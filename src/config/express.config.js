@@ -6,6 +6,7 @@ const { swaggerUi, swaggerSpec } = require('./swagger');
 require("./mongo.config")
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
+require("dotenv").config
 const app = express();
 
 const corsOptions = {
@@ -13,10 +14,8 @@ const corsOptions = {
     'http://localhost:3000',
     'http://localhost:5173', 
     'http://127.0.0.1:3000',
-    // 'http://127.0.0.1:5173',
-    // 'https://89c9aaa60cc5.ngrok-free.app', 
-    // 'https://c9eb8ef149dc.ngrok-free.app'
-  ],
+    'https://da1d3ce00fcf.ngrok-free.app/ '
+     ],
   credentials: true, 
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
@@ -49,6 +48,14 @@ app.use((req, res, next) => {
     status: "NOT_FOUND_ERR",
   });
 });
+
+// app.get('/api/maps-key', (req, res) => {
+//   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+//   if (!apiKey) {
+//     return res.status(500).json({ error: 'API key not found' });
+//   }
+//   res.json({ apiKey });
+// });
 
 app.use((error, req, res, next) => {
 
