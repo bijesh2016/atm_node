@@ -42,18 +42,20 @@ class UserService{
 
     }
 
-    getUserPublicProfile(user){
-        return{
-            _id:user._id,
-            name:user.name,
-            email:user.email,
-            role:user.role,
-            gender:user.gender,
-            address:user.address,
-            dob:user.dob,
-            phone:user.phone,
-            status:user.status,
-            image:user?.image?.thumbUrl,
+    async updateUser(userId, updateData) {
+        try {
+            const user = await UserModel.findByIdAndUpdate(
+                userId,
+                { $set: updateData },
+                { new: true, runValidators: true }
+            );
+            if (!user) {
+                throw new Error('User not found');
+            }
+            return user;
+        } catch (exception) {
+            console.error('Error updating user:', exception);
+            throw exception;
         }
     }
 

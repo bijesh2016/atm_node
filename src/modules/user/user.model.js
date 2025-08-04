@@ -50,10 +50,14 @@ const UserSchema=new mongoose.Schema({
     },
     activationToken:String,
     expiryTime:Date,
-    resetPasswordToken:String,
-    resetPasswordExpires:Date
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
+    lastLogin: {
+        type: Date,
+        default: null
+    }
 },{
-    timestamps:true,
+    timestamps: true,
     autoCreate:true,
     autoIndex:true
 })

@@ -10,6 +10,7 @@ const localLevelRouter = require("../modules/local_level/local_level.router");
 const reviewRouter = require("../modules/review/review.router");
 const contactRouter = require('../modules/contact/contact.router');
 const adminContactRouter = require('../modules/contact/admin_contact.router');
+const adminRouter = require('../modules/admin');
 // const { authenticationRouter } = require("../modules/auth/authentication");
 
 router.get("/", (req, res, next) => {
@@ -32,6 +33,7 @@ router.use('/local_level', localLevelRouter);
 router.use('/reviews', reviewRouter);
 router.use('/contacts', contactRouter);
 router.use('/admin-contact', adminContactRouter);
+router.use(adminRouter);
 // router.use('/demo-auth', authenticationRouter);
 
 module.exports = router;

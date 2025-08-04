@@ -3,10 +3,12 @@ const multer = require("multer");
 const cors = require("cors");
 const router = require("./router.config");
 const { swaggerUi, swaggerSpec } = require('./swagger');
-require("./mongo.config")
+require("./mongo.config");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
-require("dotenv").config
+require("dotenv").config();
+const { globalErrorHandler, notFoundHandler } = require("../utilities/errorHandler");
+const path = require("path");
 const app = express();
 
 const corsOptions = {
@@ -41,13 +43,8 @@ app.use("/assets", express.static("./public/uploads"));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
-app.use((req, res, next) => {
-  next({
-    code: 404,
-    message: "Resources not found",
-    status: "NOT_FOUND_ERR",
-  });
-});
+// 404 handler for unhandled routes
+app.use(notFoundHandler);
 
 // app.get('/api/maps-key', (req, res) => {
 //   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -57,37 +54,7 @@ app.use((req, res, next) => {
 //   res.json({ apiKey });
 // });
 
-app.use((error, req, res, next) => {
-
-
-  console.log("garbage Collector:", error);
-  console.log("I am here");
-
-
-  let statusCode = error.code || 500;
-  let details = error.details || null;
-  let msg = error.message || "Internal Server Error";
-  let status = error.status || "SERVER ERROR";
-
-  if(error.name==="MongoServerError"){
-        statusCode=400;
-        msg='DB error'
-        status='DB_ERROR'
-        details={};
-
-        if(+error.code===11000){
-            Object.keys(error.keyPattern).map((field)=>{
-                details[field]=`${field} should be unique.`
-            })
-        }
-    }
-
-  res.status(statusCode).json({
-    error: details,
-    message: msg,
-    status: status,
-    option: null,
-  });
-});
+// Global error handling middleware
+app.use(globalErrorHandler);
 
 module.exports = app;

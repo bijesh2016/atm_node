@@ -66,6 +66,9 @@ class AuthController {
         { expiresIn: "1d" }
       );
 
+      // Update last login timestamp
+      await userSvc.updateUser(user._id, { lastLogin: new Date() });
+      
       const { password: _, role, ...otherDetails } = user._doc || user;
       res
         .cookie("access_token", token, {
@@ -78,7 +81,10 @@ class AuthController {
         .json({
           message: "Login Successful",
           status: "LOGIN_SUCCESS",
-          details: { ...otherDetails },
+          details: { 
+            ...otherDetails,
+            lastLogin: new Date() // Include the last login time in the response
+          },
           isAdmin: role === 'admin',
         });
     } catch (error) {
